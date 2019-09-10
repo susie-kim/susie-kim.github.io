@@ -29,13 +29,13 @@ interests:
 
 education:
   courses:
-  - course: PhD in Second Language Studies
+  - course: Ph.D. in Second Language Studies
     institution: Michigan State University
     year: 2019
-  - course: MEd in English Education
+  - course: M.Ed. in English Education
     institution: Graduate School of Education, Yonsei University
     year: 2013
-  - course: BA in English Language and Literature
+  - course: B.A. in English Language and Literature
     institution: Yonsei University
     year: 2011
 
