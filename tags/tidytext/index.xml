@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>tidytext | Susie Kim</title>
-    <link>https://susie-kim.github.io/tags/tidytext/</link>
-      <atom:link href="https://susie-kim.github.io/tags/tidytext/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/tidytext/</link>
+      <atom:link href="/tags/tidytext/index.xml" rel="self" type="application/rss+xml" />
     <description>tidytext</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Tue, 01 Jan 2019 20:00:00 -0500</lastBuildDate>
     <image>
-      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <url>/img/icon-192.png</url>
       <title>tidytext</title>
-      <link>https://susie-kim.github.io/tags/tidytext/</link>
+      <link>/tags/tidytext/</link>
     </image>
     
     <item>
       <title>Update to Using Stanford CoreNLP with R</title>
-      <link>https://susie-kim.github.io/post/2019-01-01-new-corenlp/</link>
+      <link>/post/2019-01-01-new-corenlp/</link>
       <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2019-01-01-new-corenlp/</guid>
+      <guid>/post/2019-01-01-new-corenlp/</guid>
       <description>
-&lt;script src=&#34;https://susie-kim.github.io/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
@@ -35,7 +35,7 @@
 &lt;/ul&gt;
 &lt;/div&gt;
 
-&lt;p&gt;Forget my previous posts on &lt;a href=&#34;https://susie-kim.github.io/post/2018-04-06-guide-corenlp&#34;&gt;using the Stanford NLP engine via command&lt;/a&gt; and &lt;a href=&#34;https://susie-kim.github.io/post/2018-05-04-working-xml&#34;&gt;retreiving information from XML files&lt;/a&gt; in R…. I’ve found that everything can be done in RStudio (at least I learned more about how to work with XML in R). This post replaces these two previous ones and adds more example analyses.&lt;/p&gt;
+&lt;p&gt;Forget my previous posts on &lt;a href=&#34;/post/2018-04-06-guide-corenlp&#34;&gt;using the Stanford NLP engine via command&lt;/a&gt; and &lt;a href=&#34;/post/2018-05-04-working-xml&#34;&gt;retreiving information from XML files&lt;/a&gt; in R…. I’ve found that everything can be done in RStudio (at least I learned more about how to work with XML in R). This post replaces these two previous ones and adds more example analyses.&lt;/p&gt;
 &lt;div id=&#34;preparation&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;1&lt;/span&gt; . Preparation&lt;/h1&gt;
 &lt;div id=&#34;install-java&#34; class=&#34;section level2&#34;&gt;
@@ -1163,7 +1163,7 @@ VBZ
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_bi %&amp;gt;% filter(lemma == &amp;quot;be&amp;quot;) %&amp;gt;% count(second_pos, sort = TRUE)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The “be” verb most frequently co-occurs with another verb in the past participle form (i.e., VBN), so presumably the 34 occurrences are passive constructions, in which “be” serves as an auxiliary.&lt;/p&gt;
 &lt;p&gt;It’s almost certain that a determiner starts a noun phrase, thus in 27 cases the “be” verb is a main verb and is followed by a noun phrase complement.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://susie-kim.github.io/post/2019-01-01-new-corenlp_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;864&#34; style=&#34;display: block; margin: auto auto auto 0;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-01-01-new-corenlp_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;864&#34; style=&#34;display: block; margin: auto auto auto 0;&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_bi %&amp;gt;% filter(lemma == &amp;quot;be&amp;quot;, second_pos == &amp;quot;VBN&amp;quot;) %&amp;gt;% select(bigram)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## # A tibble: 34 x 1
 ##    bigram        
