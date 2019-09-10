@@ -1,0 +1,16 @@
+# Font style metadata
+name = "Minimal"
+
+# Optional Google font URL
+google_fonts = "Poppins:400,700|Mukta:400,400italic,700|Fira+Mono"
+#https://fonts.google.com/
+
+# Font families
+heading_font = "Poppins"
+body_font = "Mukta"
+nav_font = "Poppins"
+mono_font = "Fira Mono"
+
+# Font size
+font_size = "16"
+font_size_small = "16"

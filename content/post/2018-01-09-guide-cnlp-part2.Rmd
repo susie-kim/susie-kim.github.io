@@ -1,0 +1,167 @@
+---
+title: "A basic guide to using NLP for corpus analysis with R (Part 2): Processing
+  text files"
+author: Susie Kim
+date: '2018-01-09T16:20:46-05:00'
+tags:
+- corpus
+- cleannlp
+- spacy
+- nlp
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+```{r setup, include=FALSE}
+chooseCRANmirror(graphics=FALSE, ind=1)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+If you're working with language data, you probably want to process text files rather than strings of words you type on to an R script. Here is how to deal with files. Refer to the previous post for setting the tools up if needed.
+
+# . Processing text files
+Place all text files that you want to process under the working directory. For example, currently my working directory is set as: `C:/my/working/directory/`. The .txt files that I will process are in a folder named corpus under this working directory: `C:/my/working/directory/corpus`. Before proceeding to the next part, load the `cleanNLP` and `reticulate` packages, and initiate spaCy by executing `cnlp_init_spacy` and specifying the language model.
+
+```{r}
+library(cleanNLP); library(reticulate)
+cnlp_init_spacy(model_name = "en_core_web_lg")
+```
+
+## . Annotate a single text
+Let's say the name of the text file I want to analyze is: text_01.txt, and it's in the corpus folder right under the working directory. Here is how to process this particular file:
+
+```{r}
+#annotate a single file
+single.text <- cnlp_annotate("corpus/text_01.txt", as_strings = FALSE)
+```
+
+It's as simple as that. Setting `as_strings = FALSE` lets the annotator know that the path provided is the name of a file, not actual text that's waiting to be annotated.
+
+## . Annotate all files in a folder
+Under the folder corpus, I actually have 5 text files and I'd like to process them all. Here is the code that will annotate all these files:
+
+```{r}
+#annotate all .txt files in a folder
+all.text <- cnlp_annotate("corpus/*.txt", as_strings = FALSE)
+```
+
+Again, simple! The package has annotated all .txt files under the folder corpus, and the results are saved in a data list named all.text. Something you might want to check at this point is whether all files in your folder are analyzed. Type and execute:
+
+```{r}
+cnlp_get_document(all.text)
+```
+
+With this example, it shows 5 files that I've just processed. If you have more than 10 files, the console pane won't display the entire list, so you might want to save this data table as a data frame to view it.
+
+```{r}
+texts.doc <- cnlp_get_document(all.text)
+```
+
+Then of course you have all annotated objects that you can retrieve as I have previous talked about:
+
+```{r eval=FALSE}
+cnlp_get_token(all.text)
+```
+
+This might just be all you need and you can take it from here to analyze the results with this data with any other software. While we have R running, I will briefly look at some descriptive statistics by using R in the next section.
+
+
+# . Describing data
+Because we now have the language data under investigation as a data table with words, lemmas, and part-of-speech tags, we can easily describe the this data in frequencies.
+
+## . Frequency tables
+The most interesting part of the data is included in the data frame token, so I'm saving it as a new data frame that I can easily access:
+
+```{r}
+t.data <- as.data.frame(all.text$token)
+```
+
+There are many different ways to get desired information, but I will just stick to using the `table` function for now. First, to see how many sentences there are in this data, remember that each sentence start is marked as "ROOT" when annotated? I'll take advantage of that and type in:
+
+```{r}
+table(t.data$lemma=="ROOT")
+```
+
+What I see now is a table with labels FALSE and TRUE in the console. The number associated with FALSE is the number of lemmas other than ROOT (hence actual tokens), and the one associated with TRUE is the number of ROOTs, in other words, sentences.
+
+So here I have 93 sentences.
+
+Use the following codes to see the frequencies of universal POS:
+
+```{r}
+table(t.data$upos)
+```
+
+After looking at the results, you will want to get rid of things tagged as "X", punctuation, spaces, etc. unless you are interested in these features. An easy way to do it is to use the `filter` function from `dplyr`. I'm creating a new data frame that includes only the following tags:
+
+```{r include=FALSE}
+library(dplyr)
+c.data <- filter(t.data, upos %in% c("ADJ", "ADV", "NOUN", "VERB"))
+```
+
+```{r eval=FALSE}
+library(dplyr)
+c.data <- filter(t.data, upos %in% c("ADJ", "ADV", "NOUN", "VERB"))
+```
+
+Also, see the list of tags explained [here](https://spacy.io/api/annotation#pos-tagging).
+
+The new data frame, c.data, probably only includes words that are adjective, adverb, noun, or verb now. Run the codes for the frequency table again, replacing the name of the data frame to see the changes.
+
+To look at the percentages, use `prop.table`. For example, see the percentage of each category under universal POS:
+
+```{r}
+prop.table(table(c.data$upos))
+```
+
+I will save two frequency tables as data frames, one for lemmas and one for universal POS tags.
+
+```{r}
+freq.lem <- data.frame(table(c.data$lemma))
+freq.upos <- data.frame(table(c.data$upos))
+```
+
+I will also order them by descending frequency using the arrange function in dplyr:
+
+```{r}
+freq.lem <- arrange(freq.lem, desc(Freq))
+freq.upos <- arrange(freq.upos, Var1)
+```
+
+## . Basic visualization
+I will make just one graph here, using the base graphics included in R. With the frequency data, it would make sense to visualize it as a bar plot.
+
+Enter the following code. The first argument should be height, or the y-axis value (here, frequencies):
+
+```{r}
+barplot(freq.upos$Freq, names.arg = freq.upos$Var1, 
+        xlab = "Universal part-of-speech tags", ylab = "Observed frequencies")
+```
+
+I'll make a graph of the top ten most frequent lemma with the package `ggplot2`.
+
+```{r include=FALSE}
+library(ggplot2)
+```
+
+```{r}
+top.lem <- subset(freq.lem[1:10,])
+names(top.lem)[1] <- "lemma" #change the variable (column 1) name to "lemma"
+top.lem$lemma <- levels(droplevels(top.lem$lemma)) #remove other lemmas that are listed as factors
+ggplot(top.lem, aes(x = lemma, y = Freq, label = Freq)) + 
+     geom_bar(stat = "identity", fill = "black", size = 6) + 
+     geom_text(color = "white", size = 4, hjust = 1.5) + 
+     labs(x = "Lemma", y = "Frequency", title = "Top 10 most frequent lemmas") + 
+     coord_flip() + theme_minimal()
+```
+
+While the graph looks neat, one thing that bothers me is that spaCy lemmatizes all pronouns as “-PRON-”. This algorithm not only fails to distinguish between the first, second, and third person pronouns but also the hyphens can cause some issues with data handling. I’d run a code to re-lemmatize all pronouns if I wanted to include them in my analysis.
+
+If you just need to tag texts for concordancing, it is much faster and appropriate to use existing software such as [TagAnt](http://www.laurenceanthony.net/software/tagant/) (Anthony, 2015). The tools I've used here are effective for data analysis. 
+
+I'll continue to post, for my own documentation purpose, tools and techniques related to NLP and corpus analysis.

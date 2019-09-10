@@ -1,0 +1,284 @@
+---
+title: "Comparing tools for obtaining word token and type"
+author: Susie Kim
+date: '2018-12-25T20:00:00-05:00'
+tags:
+- corpus
+- token
+- type
+- R
+- corpus analysis
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr); library(kableExtra)
+```
+
+When analyzing texts in any context, the most basic linguistic characteristics of the corpus (i.e., texts) to describe are word tokens (i.e., the number of words) and types (i.e., the number of distinct words). These numbers, however, will be slightly different depending on which software you use. I wanted to compare different options for obtaining the number of tokens and types. 
+
+In this post, I use the R packages `quanteda`, `tidytext` + `textstem`, the NLP engines that I have introduced in this blog (spacy and Stanford CoreNLP), and popular software, AntConc and Wordsmith (version 7), for such comparison. 
+
+# . Text files
+I have randomly chosen five essays from [LOCNESS](https://uclouvain.be/en/research-institutes/ilc/cecl/locness.html) to use in as examples.  
+
+I prefer using the package `readtext` to build a raw corpus. It will create a data table with the document ID and text in two separate columns for each file. I named the corpus object `txt`.
+
+```{r}
+library(readtext)
+txt <- readtext("corpus/*.txt")
+head(txt)
+```
+
+# . Working with R packages
+## . Quanteda
+The package [`quanteda`](https://github.com/quanteda/quanteda), which stands for quantitative analysis of textual data, provides simple functions that compute the number of tokens, `ntoken()`, and types `ntype()`. This seems to be something quick and dirty. 
+
+```{r message=FALSE}
+library(quanteda)
+
+ex <- "This is an example. Here is another example sentence, providing a couple short sentences."
+
+ntoken(ex)
+ntype(tolower(ex))
+```
+`ntoken` says there are 17 tokens, which suggests that each word is counted including puncuation marks. `ntype` says there are 14 types. I assume that these are: "this", "is" (2), "an", "example" (2), "." (2), "here", "another", "sentence", ",", "providing", "a", "couple", "short", "sentences". In other words, the `ntype` function only considers the same exact words as one type. Therefore, the pairs "a" and "an" and "sentence" and "sentences", appear as different two different types. This actually doesn't agree with the definition of word type. 
+
+I already have the corpus `txt`, but I can feed this into `quanteda`'s `corpus()` function to build its version of corpus. Calling summary, I can see the types and tokens in each text. The Type column must be computed differently through this process than through the `ntype()` function, as I see different numbers. However, I'm not sure what causes such difference.
+
+```{r}
+(quant_n <- summary(corpus(txt)))
+```
+
+The differences range from 5 to 12. I will append this result as `Type_word` to the data table for later comparisons.
+
+```{r}
+ntype(tolower(txt$text))
+```
+
+This is the summary of results from using the `quanteda` package.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+quant_n <- data.frame(id = quant_n$Text, 
+                      Tokens = quant_n$Tokens, 
+                      Types = quant_n$Types, 
+                      Types_word = ntype(tolower(txt$text)))
+
+kable(quant_n, row.names = FALSE) %>% 
+    kable_styling("striped", full_width = TRUE) %>% 
+    column_spec(1, width = "15em", background = "gray80") %>% 
+    column_spec(2:4, width = "10em")
+```
+
+
+## . Tidytext
+The package [`tidytext`](https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html) includes a tokenizing function, `unnest_tokens()`. It automatically removes punctuation marks. Therefore, the result will defintiely be different from the previous analysis. 
+
+I don't think this package includes any lemmatizing functions so I turn to the `textstem` package for this process. `lemmatize_words()` litterally lemmatizes words, meaning that it returns the base form of each word. For instance, the word "men" is noted as "man" in the lemma column below.
+
+```{r message=FALSE}
+library(tidytext); library(textstem); library(dplyr)
+
+tidy_text <- txt %>% 
+    unnest_tokens(word, text) %>% 
+    mutate(lemma = lemmatize_words(word))
+
+head(tidy_text, 10)
+```
+
+You can see from the code below that `Types_word` is the number of unique words, and Types_lemma is the number of unique lemmas.
+
+```{r message=FALSE}
+tidy_n <- tidy_text %>% 
+    group_by(doc_id) %>% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma))) %>% 
+    rename(id = doc_id)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+kable(tidy_n, row.names = FALSE) %>% 
+    kable_styling("striped", full_width = TRUE) %>% 
+    column_spec(1, width = "15em", background = "gray80") %>% 
+    column_spec(2:4, width = "10em")
+```
+
+
+# . Results from Natural Language Processing Tools
+
+## . spacy
+For installation, see [my previous post on the topic](/post/2018-01-09-guide-cnlp-part1/). 
+I annotate the corpus using the `cnlp_annotate` function, which will perform tokenization, lemmatization, and tagging for parts-of-speech.
+
+```{r message=FALSE}
+library(cleanNLP); library(reticulate)
+
+cnlp_init_spacy(model_name = "en_core_web_lg")
+cnlp_ann <- cnlp_annotate(txt)
+cnlp_tok <- cnlp_get_token(cnlp_ann)
+```
+
+```{r}
+head(cnlp_tok, 10)
+```
+
+Here is the result from this data. I've included the number of unique words, which would presumably be equivalent to `quanteda`'s `ntype` function.
+
+```{r}
+cnlp_n <- cnlp_tok %>% 
+    group_by(id) %>% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+kable(cnlp_n, row.names = FALSE) %>% 
+    kable_styling("striped", full_width = TRUE) %>% 
+    column_spec(1, width = "15em", background = "gray80") %>% 
+    column_spec(2:4, width = "10em")
+```
+
+## . Stanford CoreNLP
+To exercise this option, I utilzed the Stanford CoreNLP tool, the process of which is illustrated in [this post](/post/2018-04-06-guide-corenlp/). I have already processed the tfiles and only present the results here. The types of output I have genereated are the same as with the previous one.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(XML); library(purrr); library(dplyr)
+files <- list.files("corpus/xml")
+setwd("corpus/xml")
+
+st_xml <- function(file){
+    message("Loading ", file)
+    xlist <- file %>% xmlInternalTreeParse() %>% 
+        xmlRoot() %>% 
+        xpathSApply("//token", function(x) xmlSApply(x, xmlValue))
+    tags <- data.frame(t(xlist), row.names = NULL)
+}
+
+st_tok <- map(files, st_xml) %>% set_names(files) %>% bind_rows(.id = "id")
+st_tok$id <- gsub("\\.xml", "", st_tok$id)
+```
+
+```{r message=FALSE, warning=FALSE}
+head(st_tok, 10)
+
+snlp_n <- st_tok %>% group_by(id) %>% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+kable(snlp_n, row.names = FALSE) %>% 
+    kable_styling("striped", full_width = TRUE) %>% 
+    column_spec(1, width = "15em", background = "gray80") %>% 
+    column_spec(2:4, width = "10em")
+```
+
+# . Comparisons
+
+So far, I have obtained word tokens and types using four different methods. I also ran the texts in AntConc and Wordsmith, which are not described here.
+
+## . Tokens
+Let's look at the number of tokens that the different methods of analysis/software produced.
+
+```{r include=FALSE}
+ant_n <- data.frame(id = txt$doc_id, 
+                    Tokens = c(289, 490, 623, 351, 343), 
+                    Types = c(156, 261, 245, 188, 174))
+
+ws_n <- data.frame(id = txt$doc_id, 
+                   Tokens = c(288, 487, 623, 353, 341), 
+                   Types = c(155, 260, 245, 189, 173))
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+kable(data.frame(id = txt$doc_id, 
+                 quanteda = quant_n$Tokens, 
+                 tidytext = tidy_n$Tokens, 
+                 cnlp = cnlp_n$Tokens, 
+                 snlp = snlp_n$Tokens, 
+                 antconc = ant_n$Tokens, 
+                 wordsmith = ws_n$Tokens)) %>% 
+    kable_styling("striped", full_width = TRUE) %>% 
+    column_spec(1, width = "15em", background = "gray80") %>% 
+    column_spec(2:7, width = "10em")
+```
+
+The fact that the numbers are similar among tidytext, antconc, and wordsmith suggests that AntConc and Wordsmith do not include punctuation in their word count, which makes sense. cnlp and snlp currently include punctuation so I will remove them and recalculate the tokens and types.
+
+```{r}
+cnlp_n <- cnlp_tok %>% filter(!upos %in% c("PUNCT", "SYM", "NUM")) %>% 
+    group_by(id) %>% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))
+
+#create a list of POS tags to exclude 
+except <- c(",", ".", "``", "''", ":", "#", "$", "-LRB-", "-RRB-", "CD")
+
+snlp_n <- st_tok %>% filter(!POS  %in% except) %>% 
+    group_by(id) %>% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+kable(data.frame(id = txt$doc_id, 
+                 quanteda = quant_n$Tokens, 
+                 tidytext = tidy_n$Tokens, 
+                 cnlp = cnlp_n$Tokens, 
+                 snlp = snlp_n$Tokens, 
+                 antconc = ant_n$Tokens, 
+                 wordsmith = ws_n$Tokens)) %>% 
+    kable_styling("striped", full_width = TRUE) %>% 
+    column_spec(1, width = "15em", background = "gray80") %>% 
+    column_spec(2:7, width = "10em")
+```
+
+Now the results look very similar except for those from `quanteda`. The differences could be resulting from how contractions, numbers, and non-characters are accounted for. These numbers are also slightly different from the word count from Microsoft Word, but close enough.
+
+## . Types
+The number of unique words is interesting because even though I have removed punctuation marks, there are some differences between tidytext and cnlp/snlp:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+kable(data.frame(id = txt$doc_id, 
+                 quanteda = quant_n$Types_word, 
+                 tidytext = tidy_n$Types_word, 
+                 cnlp = cnlp_n$Types_word, 
+                 snlp = snlp_n$Types_word)) %>% 
+    kable_styling("striped", full_width = TRUE) %>% 
+    column_spec(1, width = "15em", background = "gray80") %>% 
+    column_spec(2:5, width = "10em")
+```
+
+Next, I compared the unique lemma types. Right off the bat, quanteda's type is visibly deviant from others so I would not trust that. There are two patterns: numbers obtained from AntConc and Wordsmith are very similar, and the numbers from tidytext, cnlp (spacy), and snlp (Stanford CoreNLP) are very close to one another. The numbers of these two groups are also different enough to assume that the number of unique lemma is not how word type is computed in conventional software. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+kable(data.frame(id = txt$doc_id, 
+                 quanteda = quant_n$Types, 
+                 tidytext = tidy_n$Types_lemma, 
+                 cnlp = cnlp_n$Types_lemma, 
+                 snlp = snlp_n$Types_lemma, 
+                 antconc = ant_n$Types, 
+                 wordsmith = ws_n$Types)) %>% 
+    kable_styling("striped", full_width = TRUE) %>% 
+    column_spec(1, width = "15em", background = "gray80") %>% 
+    column_spec(2:7, width = "10em")
+```
+
+While, conceptually, one might think that the words "sentence" and "sentences" are the same word, tokens include different forms of the same lemma. For instance, "am", "are", "was", "were" are four tokens. 
+
+Tokens from AntConc and Wordsmith are different from the number of unique words shown above, with the results from NLP being slightly larger. I suspect that how numbers and contractions are treated has something to do with this. In NLP, contractions become separated: For example, "shouldn't" becomes two words, "should" and "not". In AntConc, "shouldn't" becomes "shouldn" and "t". Therefore "should" and "shouldn" are two types. In Wordsmith, "shouldn't" is just one word. 
+
+Obtaining tokens and types by file has so far been the easiest with Wordsmith, but the software requires purchase. AntConc is freely avilable, but doesn't analyze text by text when there is a batch of files to process. In my quest to examine and compare how the tokens and types differ by software, I found that using `tidytext` was the simplest yet reliable in computing word tokens and types.

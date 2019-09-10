@@ -1,0 +1,190 @@
+---
+title: "A basic guide to using NLP for corpus analysis with R (Part 1): Installing
+  Python, spacy, and cleanNLP"
+author: Susie Kim
+date: '2018-01-09T16:10:46-05:00'
+tags:
+- corpus
+- cleannlp
+- spacy
+- nlp
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#installing-python"><span class="toc-section-number">1</span> . Installing Python</a><ul>
+<li><a href="#download-python"><span class="toc-section-number">1.1</span> . Download Python</a></li>
+<li><a href="#install-python"><span class="toc-section-number">1.2</span> . Install Python</a></li>
+<li><a href="#test-if-python-works"><span class="toc-section-number">1.3</span> . Test if Python works</a></li>
+</ul></li>
+<li><a href="#installing-nlp-backend-spacy"><span class="toc-section-number">2</span> . Installing NLP backend: spaCy</a><ul>
+<li><a href="#install-spacy"><span class="toc-section-number">2.1</span> . Install spacy</a></li>
+<li><a href="#download-language-models"><span class="toc-section-number">2.2</span> . Download language models</a></li>
+</ul></li>
+<li><a href="#getting-ready-with-rstudio"><span class="toc-section-number">3</span> . Getting ready with RStudio</a><ul>
+<li><a href="#install-all-requirements"><span class="toc-section-number">3.1</span> . Install all requirements</a></li>
+<li><a href="#processing-a-text-string"><span class="toc-section-number">3.2</span> . Processing a text string</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>This is Part 1 of a basic guide for setting up and using a natural language processing (NLP) tool with R. I specifically utilze the spaCy “industrial strength natural language processing” Python library, and an R wrapper called <a href="https://statsmaths.github.io/cleanNLP/">cleanNLP</a> that provides tools for annotating texts and obtaining data tables. In this post, I will explain step-by-step how to get ready to work with text data using these two packages, and a snippet of what they can do.</p>
+<p>I decided to write this post because for someone like me who has no background in computer science but wants to get their feet wet with NLP. It could be difficult to get started with these tools because you don’t know where to start or what to exactly look for. I have not yet seen any webpages that describe what I’m trying to do all in one place. It took a while for me to hunt down the information that I needed to carry out the kind of analyses that I wanted to do, and took many failed attempts to finally get the computer programs working. SpaCy and cleanNLP utilized in R have so far been the easiest to learn and work with in my experience as a beginner.</p>
+<p>In this post, I assume you have some experience with R, but you should be able to follow along (though might not be able to understand what’s going on exactly) even if you haven’t used it before.</p>
+<p>In case you need to install R and RStudio:<br />
+<a href="https://cran.r-project.org/bin/windows/base/">Download R for Windows</a><br />
+<a href="https://www.rstudio.com/products/rstudio/download/">Download RStudio</a></p>
+<p>Before you begin, check your computer system environment and compare it with mine. My guidelines might not work in your setting and you might experience issues that I don’t mention here (use Google search!). My system environment is: Windows 10 64-bit operating system.</p>
+<div id="installing-python" class="section level1">
+<h1><span class="header-section-number">1</span> . Installing Python</h1>
+<p>If you have never installed Python on your computer, great. You start with a clean slate and it might work the best. If you already have Python installed (must be Python 2.7 and up) but not sure if it works, skip to the end of this section (1.3) to test it.</p>
+<p>Here, I’m installing the latest version of Python, 3.6.4, which works with my OS. If you don’t use Python for anything else, just following these instructions will probably be your best bet. There are different ways to install Python, for example, using <a href="https://www.anaconda.com/download/">Anaconda</a> which provides GUI and may be better in the long run, but I won’t use it here.</p>
+<div id="download-python" class="section level2">
+<h2><span class="header-section-number">1.1</span> . Download Python</h2>
+<p>First step, download Python from <a href="https://www.python.org/downloads/windows/">here</a> link for Windows. Make sure to get an installer that matches your operating system and R. In other words, if you have 32-bit R installed, download the 32-bit version (labelled “Windows x86”). With 64-bit R, download 64-bit Python (labelled “Windows x86-64”).</p>
+</div>
+<div id="install-python" class="section level2">
+<h2><span class="header-section-number">1.2</span> . Install Python</h2>
+<p>After the download is complete, execute the installer. Two important things. First, check the box that says “add to PATH” when you see it. For Python 2.7.x, this option has a different appearance - not as a checkbox but an icon to click somewhere during the setup. If you have accidentally neglected to check the “add to PATH” box, you will need to manually add the path for Python to the system environment variables (but it might be difficult to find what works for your system so you might as well just uninstall, reboot, and reinstall, enabling the above-mentioned option). Second, I recommend just use the default directory provided as the location. In my case, Python did not work properly when I installed it under a different location.</p>
+</div>
+<div id="test-if-python-works" class="section level2">
+<h2><span class="header-section-number">1.3</span> . Test if Python works</h2>
+<p>Open up a Command Prompt by searching “command …” or “cmd” from the windows start menu. Preferably, open the program by right-clicking the mouse and selecting “run as administrator”. If you don’t run it as admin, it’s fine for now but you have to run it as admin when you execute Section 2.2 Download language models.</p>
+<p>Type <code>python</code> and hit enter.</p>
+<p>Your installation was successful if you see something like this:<br />
+&gt; Python 3.6:d48eceb, Dec 19 2017, 06:54:40 64 bit (AMD64)] on win32
+&gt; Type “help”, “copyright”, “credits” or “license” for more information.</p>
+<p>If you get a message that says “python is not recognized as internal or external command”, which I don’t think you will, as long as you have followed the instructions exactly so far, it means trouble. If you don’t know well about these issues, the simplest solution is to uninstall, reboot, and reinstall. Hopefully you have not encountered any issues and have Python up and running now.</p>
+<p>Now type in <code>exit()</code> to move on to installing spaCy.</p>
+</div>
+</div>
+<div id="installing-nlp-backend-spacy" class="section level1">
+<h1><span class="header-section-number">2</span> . Installing NLP backend: spaCy</h1>
+<p>To put it very simply, spaCy is a library that processes and analyzes languages. CleanNLP utilizes this specific Python library. Another option with cleanNLP is coreNLP (Java). I find spaCy lighter and easier to set up than coreNLP (a point also noted by the creators). Here I only demonstrate installing spaCy. See the “Backends” section from <a href="https://statsmaths.github.io/cleanNLP/">here</a> for more information related to this.</p>
+<div id="install-spacy" class="section level2">
+<h2><span class="header-section-number">2.1</span> . Install spacy</h2>
+<p>In your Command Prompt, enter the following code:<br />
+<code>pip install -U spacy</code></p>
+<p>It can take several minutes to finish installing. If it fails to install with the error message that says Microsoft Visual C++ 14.0 is required, go download <a href="https://visualstudio.microsoft.com/visual-cpp-build-tools/">Visual C++ Build Tools</a> and retry.</p>
+</div>
+<div id="download-language-models" class="section level2">
+<h2><span class="header-section-number">2.2</span> . Download language models</h2>
+<p>Next step is to install the language models (as in Python packages) that you want. SpaCy provides packages for a number of languages: see <a href="https://spacy.io/usage/models">the models</a> for languages other than English. In this example, I will install English models that I will use to process texts in English. One thing to note is that within English, different models are offered. Go to this page and scroll down to read about the models. The larger the model is, the more accurate it is, though the differences don’t seem to be that big.</p>
+<p>Enter the following code to the command line:<br />
+<code>python -m spacy download en_core_web_sm</code></p>
+<p>The default model is <a href="https://spacy.io/models/en#en_core_web_sm">en_core_web_sm</a>. You can install multiple models if you wish. I installed the largest model:<br />
+<code>python -m spacy download en_core_web_lg</code></p>
+<p>If you see an error message saying that linking was unsuccessful, it could be because you didn’t run the Command as administrator.</p>
+<p>After downloading and linking is complete, test if the installed modules work by trying the following codes, one line at a time:<br />
+<code>python</code>
+<code>import spacy</code><br />
+<code>nlp = spacy.load('en_core_web_sm')</code><br />
+<code>doc = nlp(u'This is a sentence.')</code><br />
+<code>print(doc)</code></p>
+<p>Did the last code return “This is a sentence.”? If yes, yay! - it’s probably safe to assume everything is running smoothly. Quit the Command Prompt and start RStudio. (Restart RStudio if you have had it open while installing spacy.)</p>
+</div>
+</div>
+<div id="getting-ready-with-rstudio" class="section level1">
+<h1><span class="header-section-number">3</span> . Getting ready with RStudio</h1>
+<div id="install-all-requirements" class="section level2">
+<h2><span class="header-section-number">3.1</span> . Install all requirements</h2>
+<p>This portion has been updated on December 21, 2018 to accommodate changes made to the cleanNLP package.</p>
+<p>Create a new R script. The required packages for cleanNLP are:</p>
+<pre class="r"><code>#install packages: cleanNLP, reticulate
+install.packages(&quot;cleanNLP&quot;); install.packages(&quot;reticulate&quot;)</code></pre>
+<pre class="r"><code>#load the packages
+library(cleanNLP)
+library(reticulate)</code></pre>
+<p>To get started with processing texts, you need to initialize spacy:</p>
+<pre class="r"><code>#initalized the NLP backend
+cnlp_init_spacy(model_name = &quot;en_core_web_sm&quot;)</code></pre>
+<p>Now, if this doesn’t work, try the following code to see whether there’s any problems with Python configuration on your computer.</p>
+<pre class="r"><code>#check your Python configuration
+py_config()
+## python:         C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\python.exe
+## libpython:      C:/Users/susie.DESKTOP-TF1TRHP/AppData/Local/Programs/Python/Python37/python37.dll
+## pythonhome:     C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37
+## version:        3.7.4 (tags/v3.7.4:e09359112e, Jul  8 2019, 20:34:20) [MSC v.1916 64 bit (AMD64)]
+## Architecture:   64bit
+## numpy:          C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\lib\site-packages\numpy
+## numpy_version:  1.17.2
+## 
+## python versions found: 
+##  C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\python.exe
+##  C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\\python.exe</code></pre>
+<p>A little anecdote is that when I first tested the automatic annotation, I used a line from “The Stairway to Heaven”: “There’s a lady who’s sure all that glitters is gold, and she’s buying a stairway to heaven.” The default model, the small and medium sized models marked “glitters” as a noun. The large model marked the word correctly as a verb. After seeing this, I’ve been using the large model.</p>
+</div>
+<div id="processing-a-text-string" class="section level2">
+<h2><span class="header-section-number">3.2</span> . Processing a text string</h2>
+<p>This section will serve as a simple test and demonstration of the basic use of the cleanNLP package. It is based on the procedure described on the <a href="https://statsmaths.github.io/cleanNLP/">cleanNLP webpage</a></p>
+<pre class="r"><code>#make up a text
+text &lt;- &quot;Let me be the one you call. If you jump, I&#39;ll break your fall.&quot;</code></pre>
+<p>Now we have a text to analyze. Give R a command to automatically annotate the text.</p>
+<pre class="r"><code>#run the annotator
+obj &lt;- cnlp_annotate(text)</code></pre>
+<p>Now you should have new data named <code>obj</code>. It’s populated with lists of various data. Let’s view this data table with annotated objects.</p>
+<pre class="r"><code>#view the annotated data
+cnlp_get_token(obj)
+##      id sid tid  word  lemma  upos  pos cid
+## 2  doc1   1   1   Let    let  VERB   VB   0
+## 3  doc1   1   2    me -PRON-  PRON  PRP   4
+## 4  doc1   1   3    be     be  VERB   VB   7
+## 5  doc1   1   4   the    the   DET   DT  10
+## 6  doc1   1   5   one    one  NOUN   NN  14
+## 7  doc1   1   6   you -PRON-  PRON  PRP  18
+## 8  doc1   1   7  call   call  VERB  VBP  22
+## 9  doc1   1   8     .      . PUNCT    .  26
+## 11 doc1   2   1    If     if   ADP   IN  28
+## 12 doc1   2   2   you -PRON-  PRON  PRP  31
+## 13 doc1   2   3  jump   jump  VERB  VBP  35
+## 14 doc1   2   4     ,      , PUNCT    ,  39
+## 15 doc1   2   5     I -PRON-  PRON  PRP  41
+## 16 doc1   2   6 \\&#39;ll   will   AUX   MD  42
+## 17 doc1   2   7 break  break  VERB   VB  46
+## 18 doc1   2   8  your -PRON-   DET PRP$  52
+## 19 doc1   2   9  fall   fall  NOUN   NN  57
+## 20 doc1   2  10     .      . PUNCT    .  61</code></pre>
+<p>The table returns rows consisted of information regarding each token. Here are some detailed descriptions of what each column means:</p>
+<ul>
+<li><strong>id</strong>: Text id. Here ’id’s are all 1 because there is one text source.</li>
+<li><strong>sid</strong>: Sentence id (or sentence number) nested under ‘id’. We can see that we have 2 sentences in this text.</li>
+<li><strong>tid</strong>: Token id nested under ‘sid’. Note that for each sentence, ‘tid’ starts from 0 to mark ‘ROOT’, which indicates the start of a sentence. The default code hides the 0s, but they are there, and will be useful for corpus analysis.</li>
+<li><strong>word</strong>: The raw word as is in the source text.</li>
+<li><strong>lemma</strong>: The basic form of the token with no morphological changes.</li>
+<li><strong>upos</strong>: Universal part-of-speech, more general than ‘pos’.</li>
+<li><strong>pos</strong>: Language specific part-of-speech. For example, you can see tokens that are labelled as ‘VERB’ under the ‘upos’ column are further specified into verb infinitive (VB), verb present tense (VBP), and modal verbs (MD).</li>
+</ul>
+<p>See <code>?cnlp_get_token</code> for more information.</p>
+<p>Here is another data table you might be interested in:</p>
+<pre class="r"><code>cnlp_get_dependency(obj)
+##      id sid tid tid_target relation relation_full
+## 1  doc1   1   0          1     ROOT            NA
+## 2  doc1   1   3          2    nsubj            NA
+## 3  doc1   1   1          3    ccomp            NA
+## 4  doc1   1   5          4      det            NA
+## 5  doc1   1   3          5     attr            NA
+## 6  doc1   1   7          6    nsubj            NA
+## 7  doc1   1   5          7    relcl            NA
+## 8  doc1   1   1          8    punct            NA
+## 9  doc1   2   3          1     mark            NA
+## 10 doc1   2   3          2    nsubj            NA
+## 11 doc1   2   7          3    advcl            NA
+## 12 doc1   2   7          4    punct            NA
+## 13 doc1   2   7          5    nsubj            NA
+## 14 doc1   2   7          6      aux            NA
+## 15 doc1   2   0          7     ROOT            NA
+## 16 doc1   2   9          8     poss            NA
+## 17 doc1   2   7          9     dobj            NA
+## 18 doc1   2   7         10    punct            NA</code></pre>
+<p>This data frame contains annotations produced by grammatically parsing the text. In other words, they describe what roles the elements serve in each sentence. Though it is valuable information, I’m skeptical as to how accurate this parser is with learner language, so I won’t be dealing with this feature as much.</p>
+<p>This concludes Part 1 of the series. In Part 2, I will go through how to process text files - single file, multiple files, and all files under a specific directory. Please contact me if you have any questions, corrections, or suggestions!</p>
+</div>
+</div>

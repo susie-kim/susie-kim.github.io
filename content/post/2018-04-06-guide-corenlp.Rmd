@@ -1,0 +1,64 @@
+---
+title: "A guide to using the Stanford CoreNLP Tools for automatic text annotation"
+author: Susie Kim
+date: '2018-04-06T12:20:40-05:00'
+tags: 
+- corpus
+- corenlp
+- nlp
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+As the title suggests, I will guide you through how to automatically annotate raw texts using the Stanford CoreNLP in this post.
+
+# Stanford CoreNLP tools
+
+The Stanford CoreNLP is a set of natural language analysis tools written in Java programming language. It takes raw text input then tokenizes each word and parses them into the base forms of words (i.e., lemmas). The users can utilize this set of tools to further parse the text, such as tagging the parts of speech (i.e., POS tagging), marking the structure of sentences in terms of phrases or word dependencies. 
+
+Feeding the text and parsing it does not require much effort. In order to run the command lines on your computer, you need to have Java installed first. If you don't already have it, you can download it from the [Java website](https://java.com/en/download/). Once the installation is finished, the next step is to download the CoreNLP package. It can be downloaded from [here](https://stanfordnlp.github.io/CoreNLP/).
+
+I have the 3.8.0 version, but as of now, the website offers version 3.9.1.
+After you download the zip file, extract them to a folder that you will remember. In this post, I will refer to this folder as "stanford-corenlp".
+
+## Parsing
+
+Before jumping into running the command lines, place the text files you want to parse under the "stanford-corenlp" folder. If you have multiple files, it's better to create a new folder and place the text files there. There is an option to create a list of the files but I currently don't see the need for it because it requires extra work to create the filelist. In my example, I have a folder called "corpus" that contains all the text files I want to process.
+
+You are now ready to run the commands. Open the command propmt application on your computer (More information is available at the [Stanford CoreNLP website](<https://stanfordnlp.github.io/CoreNLP/cmdline.html>).
+You only need two lines to parse the text you want. First, you want to navigate into your "stanford-corenlp" folder. Copy or type in the folder address as is set up on your computer after the command `cd`:  
+`cd C:/Users/Me/Documents/stanford-corenlp`
+
+Your command prompt will now show you this in the beginning of a new line:  
+`C:\Users\Me\Documents\stanford-corenlp>`
+
+This is the command line that actually processes the text files:  
+`java -cp "*" -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,lemma,parse -file corpus -outputDirectory corpus`
+Note. This command should be in a single line
+
+In this example, I have three specific commands:
+
+(1) `-annotators`: this specifies what analysis you want to do. Here, I'm asking to tokenize the text(`tokenize`), split sentences(`ssplit`), tag parts of speech(`pos`), annotate the base form of each token, in other words, lemmatize (`lemma`), and mark the structure of sentences (`parse`). 
+You need to minimally include `tokenize` and `ssplit`. Otherwise, you will either get a blank output or get an error message.
+
+(2) `-file`: identify where your text files are. If you have one specific text, you can provide the filename. For example, you're processing a file named "test.txt" that is located under the stanford-corenlp folder, simply write the name of the file (without the quotation marks) after `-file`: `-file test.txt`
+
+(3) `-outputDirectory`: If you don't specify the output directory, then the output file is automatically saved in the current base folder, stanford-corenlp. You can designate a folder as in my example.
+
+By default the output file format is XML, but others are available. You can add `-outputExtension` followed by `text`, `json`, `conll`, etc., whichever format you want and is supported.
+
+You can find the annotated script from the [CoreNLP Github](https://github.com/stanfordnlp/CoreNLP/blob/master/src/edu/stanford/nlp/pipeline/StanfordCoreNLP.java).
+
+When the processing is complete, by default, the annotated files are stored in the XML format. This stores information in a tree-like structure. The document will have branches of sentences. In the sentences node, you would have several sentence if this text is made up of multiple sentences. Under each sentence, you would also have tokens, and each token includes information about the lemma and POS.
+
+There are different ways to find what you want from this file. I'm sure there are many others than what I know. In the next post, I will parse the tree structure and format the information in the way that allows for searches with regular expressions.
+
+Feel free to leave a message or contact me if you have any questions or suggestions!
