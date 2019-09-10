@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Authors | Susie Kim</title>
+    <link>https://susie-kim.github.io/authors/</link>
+      <atom:link href="https://susie-kim.github.io/authors/index.xml" rel="self" type="application/rss+xml" />
+    <description>Authors</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright>
+    <image>
+      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <title>Authors</title>
+      <link>https://susie-kim.github.io/authors/</link>
+    </image>
+    
+    <item>
+      <title></title>
+      <link>https://susie-kim.github.io/authors/admin/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://susie-kim.github.io/authors/admin/</guid>
+      <description>&lt;p&gt;I am an applied linguist and language teacher, currently working as a Lecturer in Korean Language for the &lt;a href=&#34;https://eas.princeton.edu&#34; target=&#34;_blank&#34;&gt;Department of East Asian Studies&lt;/a&gt; at Princeton University.&lt;/p&gt;
+
+&lt;p&gt;My main research interest sits at the intersection of language assessment, second language writing, language proficiency standards (e.g., CEFR, ACTFL), and corpus-based methods. Thus far, I have primarily focused on linguistic characteristics and textual features of second language (L2) English at various proficiency levels. I plan to direct these interests toward desgining standards-based practices for foreign language programs and building/analyzing Korean language corpora for teaching purposes.&lt;/p&gt;
+
+&lt;p&gt;I have a wide range of personal interests and, though amateur, enjoy: traveling and nature photography, night sky photography, Major League Baseball and statistics, R programming, playing the guitar, making coffee, and cooking.&lt;/p&gt;
+
+&lt;p&gt;On this website, I share research tools and methods as I work through them for my academic projects or personal activities. Feel free to explore, leave comments, or contact me!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

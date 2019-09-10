@@ -1,0 +1,1116 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>token | Susie Kim</title>
+    <link>https://susie-kim.github.io/tags/token/</link>
+      <atom:link href="https://susie-kim.github.io/tags/token/index.xml" rel="self" type="application/rss+xml" />
+    <description>token</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Tue, 25 Dec 2018 20:00:00 -0500</lastBuildDate>
+    <image>
+      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <title>token</title>
+      <link>https://susie-kim.github.io/tags/token/</link>
+    </image>
+    
+    <item>
+      <title>Comparing tools for obtaining word token and type</title>
+      <link>https://susie-kim.github.io/post/2018-12-25-token-type/</link>
+      <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
+      <guid>https://susie-kim.github.io/post/2018-12-25-token-type/</guid>
+      <description>
+&lt;script src=&#34;https://susie-kim.github.io/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#text-files&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1&lt;/span&gt; . Text files&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#working-with-r-packages&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2&lt;/span&gt; . Working with R packages&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#quanteda&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2.1&lt;/span&gt; . Quanteda&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#tidytext&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2.2&lt;/span&gt; . Tidytext&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#results-from-natural-language-processing-tools&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3&lt;/span&gt; . Results from Natural Language Processing Tools&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#spacy&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.1&lt;/span&gt; . spacy&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#stanford-corenlp&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.2&lt;/span&gt; . Stanford CoreNLP&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#comparisons&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;4&lt;/span&gt; . Comparisons&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#tokens&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;4.1&lt;/span&gt; . Tokens&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#types&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;4.2&lt;/span&gt; . Types&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;When analyzing texts in any context, the most basic linguistic characteristics of the corpus (i.e., texts) to describe are word tokens (i.e., the number of words) and types (i.e., the number of distinct words). These numbers, however, will be slightly different depending on which software you use. I wanted to compare different options for obtaining the number of tokens and types.&lt;/p&gt;
+&lt;p&gt;In this post, I use the R packages &lt;code&gt;quanteda&lt;/code&gt;, &lt;code&gt;tidytext&lt;/code&gt; + &lt;code&gt;textstem&lt;/code&gt;, the NLP engines that I have introduced in this blog (spacy and Stanford CoreNLP), and popular software, AntConc and Wordsmith (version 7), for such comparison.&lt;/p&gt;
+&lt;div id=&#34;text-files&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;1&lt;/span&gt; . Text files&lt;/h1&gt;
+&lt;p&gt;I have randomly chosen five essays from &lt;a href=&#34;https://uclouvain.be/en/research-institutes/ilc/cecl/locness.html&#34;&gt;LOCNESS&lt;/a&gt; to use in as examples.&lt;/p&gt;
+&lt;p&gt;I prefer using the package &lt;code&gt;readtext&lt;/code&gt; to build a raw corpus. It will create a data table with the document ID and text in two separate columns for each file. I named the corpus object &lt;code&gt;txt&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(readtext)
+txt &amp;lt;- readtext(&amp;quot;corpus/*.txt&amp;quot;)
+head(txt)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## readtext object consisting of 5 documents and 0 docvars.
+## # Description: df[,2] [5 x 2]
+##   doc_id      text               
+## * &amp;lt;chr&amp;gt;       &amp;lt;chr&amp;gt;              
+## 1 text_01.txt &amp;quot;\&amp;quot;Two men, o\&amp;quot;...&amp;quot;
+## 2 text_02.txt &amp;quot;\&amp;quot;I am not a\&amp;quot;...&amp;quot;
+## 3 text_03.txt &amp;quot;\&amp;quot;Over the p\&amp;quot;...&amp;quot;
+## 4 text_04.txt &amp;quot;\&amp;quot;There is a\&amp;quot;...&amp;quot;
+## 5 text_05.txt &amp;quot;\&amp;quot;Boxing is \&amp;quot;...&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;working-with-r-packages&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;2&lt;/span&gt; . Working with R packages&lt;/h1&gt;
+&lt;div id=&#34;quanteda&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;2.1&lt;/span&gt; . Quanteda&lt;/h2&gt;
+&lt;p&gt;The package &lt;a href=&#34;https://github.com/quanteda/quanteda&#34;&gt;&lt;code&gt;quanteda&lt;/code&gt;&lt;/a&gt;, which stands for quantitative analysis of textual data, provides simple functions that compute the number of tokens, &lt;code&gt;ntoken()&lt;/code&gt;, and types &lt;code&gt;ntype()&lt;/code&gt;. This seems to be something quick and dirty.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(quanteda)
+
+ex &amp;lt;- &amp;quot;This is an example. Here is another example sentence, providing a couple short sentences.&amp;quot;
+
+ntoken(ex)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## text1 
+##    17&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ntype(tolower(ex))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## text1 
+##    14&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;ntoken&lt;/code&gt; says there are 17 tokens, which suggests that each word is counted including puncuation marks. &lt;code&gt;ntype&lt;/code&gt; says there are 14 types. I assume that these are: “this”, “is” (2), “an”, “example” (2), “.” (2), “here”, “another”, “sentence”, “,”, “providing”, “a”, “couple”, “short”, “sentences”. In other words, the &lt;code&gt;ntype&lt;/code&gt; function only considers the same exact words as one type. Therefore, the pairs “a” and “an” and “sentence” and “sentences”, appear as different two different types. This actually doesn’t agree with the definition of word type.&lt;/p&gt;
+&lt;p&gt;I already have the corpus &lt;code&gt;txt&lt;/code&gt;, but I can feed this into &lt;code&gt;quanteda&lt;/code&gt;’s &lt;code&gt;corpus()&lt;/code&gt; function to build its version of corpus. Calling summary, I can see the types and tokens in each text. The Type column must be computed differently through this process than through the &lt;code&gt;ntype()&lt;/code&gt; function, as I see different numbers. However, I’m not sure what causes such difference.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(quant_n &amp;lt;- summary(corpus(txt)))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Corpus consisting of 5 documents:
+## 
+##         Text Types Tokens Sentences
+##  text_01.txt   167    316        10
+##  text_02.txt   276    517        21
+##  text_03.txt   260    685        22
+##  text_04.txt   205    390        16
+##  text_05.txt   183    372        13
+## 
+## Source: D:/GitHub/susie-kim.github.io/content/post/* on x86-64 by susie
+## Created: Tue Sep 10 16:00:09 2019
+## Notes:&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The differences range from 5 to 12. I will append this result as &lt;code&gt;Type_word&lt;/code&gt; to the data table for later comparisons.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ntype(tolower(txt$text))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## text1 text2 text3 text4 text5 
+##   162   265   248   199   177&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is the summary of results from using the &lt;code&gt;quanteda&lt;/code&gt; package.&lt;/p&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Tokens
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_word
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+316
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+167
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+162
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+517
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+276
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+265
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+248
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+205
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+199
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+372
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+183
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+177
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div id=&#34;tidytext&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;2.2&lt;/span&gt; . Tidytext&lt;/h2&gt;
+&lt;p&gt;The package &lt;a href=&#34;https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html&#34;&gt;&lt;code&gt;tidytext&lt;/code&gt;&lt;/a&gt; includes a tokenizing function, &lt;code&gt;unnest_tokens()&lt;/code&gt;. It automatically removes punctuation marks. Therefore, the result will defintiely be different from the previous analysis.&lt;/p&gt;
+&lt;p&gt;I don’t think this package includes any lemmatizing functions so I turn to the &lt;code&gt;textstem&lt;/code&gt; package for this process. &lt;code&gt;lemmatize_words()&lt;/code&gt; litterally lemmatizes words, meaning that it returns the base form of each word. For instance, the word “men” is noted as “man” in the lemma column below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidytext); library(textstem); library(dplyr)
+
+tidy_text &amp;lt;- txt %&amp;gt;% 
+    unnest_tokens(word, text) %&amp;gt;% 
+    mutate(lemma = lemmatize_words(word))
+
+head(tidy_text, 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##         doc_id     word    lemma
+## 1  text_01.txt      two      two
+## 2  text_01.txt      men      man
+## 3  text_01.txt      one      one
+## 4  text_01.txt     ring     ring
+## 5  text_01.txt     only     only
+## 6  text_01.txt      one      one
+## 7  text_01.txt      can      can
+## 8  text_01.txt    leave    leave
+## 9  text_01.txt dramatic dramatic
+## 10 text_01.txt       it       it&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You can see from the code below that &lt;code&gt;Types_word&lt;/code&gt; is the number of unique words, and Types_lemma is the number of unique lemmas.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tidy_n &amp;lt;- tidy_text %&amp;gt;% 
+    group_by(doc_id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma))) %&amp;gt;% 
+    rename(id = doc_id)&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Tokens
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_lemma
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+155
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+140
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+233
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+245
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+214
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+190
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+175
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+342
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+173
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+157
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;results-from-natural-language-processing-tools&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;3&lt;/span&gt; . Results from Natural Language Processing Tools&lt;/h1&gt;
+&lt;div id=&#34;spacy&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.1&lt;/span&gt; . spacy&lt;/h2&gt;
+&lt;p&gt;For installation, see &lt;a href=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/&#34;&gt;my previous post on the topic&lt;/a&gt;.
+I annotate the corpus using the &lt;code&gt;cnlp_annotate&lt;/code&gt; function, which will perform tokenization, lemmatization, and tagging for parts-of-speech.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(cleanNLP); library(reticulate)
+
+cnlp_init_spacy(model_name = &amp;quot;en_core_web_lg&amp;quot;)
+cnlp_ann &amp;lt;- cnlp_annotate(txt)
+cnlp_tok &amp;lt;- cnlp_get_token(cnlp_ann)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(cnlp_tok, 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 10 x 8
+##    id            sid   tid word  lemma upos  pos     cid
+##    &amp;lt;chr&amp;gt;       &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;int&amp;gt;
+##  1 text_01.txt     1     1 Two   two   NUM   CD        0
+##  2 text_01.txt     1     2 men   man   NOUN  NNS       4
+##  3 text_01.txt     1     3 ,     ,     PUNCT ,         7
+##  4 text_01.txt     1     4 one   one   NUM   CD        9
+##  5 text_01.txt     1     5 ring  ring  NOUN  NN       13
+##  6 text_01.txt     1     6 ,     ,     PUNCT ,        17
+##  7 text_01.txt     1     7 only  only  ADV   RB       19
+##  8 text_01.txt     1     8 one   one   PRON  PRP      24
+##  9 text_01.txt     1     9 can   can   VERB  MD       28
+## 10 text_01.txt     1    10 leave leave VERB  VB       32&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here is the result from this data. I’ve included the number of unique words, which would presumably be equivalent to &lt;code&gt;quanteda&lt;/code&gt;’s &lt;code&gt;ntype&lt;/code&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_n &amp;lt;- cnlp_tok %&amp;gt;% 
+    group_by(id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Tokens
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_lemma
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+317
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+167
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+145
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+525
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+277
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+237
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+221
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+205
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+182
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+375
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+185
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+160
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div id=&#34;stanford-corenlp&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.2&lt;/span&gt; . Stanford CoreNLP&lt;/h2&gt;
+&lt;p&gt;To exercise this option, I utilzed the Stanford CoreNLP tool, the process of which is illustrated in &lt;a href=&#34;https://susie-kim.github.io/post/2018-04-06-guide-corenlp/&#34;&gt;this post&lt;/a&gt;. I have already processed the tfiles and only present the results here. The types of output I have genereated are the same as with the previous one.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(st_tok, 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##             id  word lemma CharacterOffsetBegin CharacterOffsetEnd POS
+## 1  text_01.txt   Two   two                    0                  3  CD
+## 2  text_01.txt   men   man                    4                  7 NNS
+## 3  text_01.txt     ,     ,                    7                  8   ,
+## 4  text_01.txt   one   one                    9                 12  CD
+## 5  text_01.txt  ring  ring                   13                 17  NN
+## 6  text_01.txt     ,     ,                   17                 18   ,
+## 7  text_01.txt  only  only                   19                 23  RB
+## 8  text_01.txt   one   one                   24                 27  CD
+## 9  text_01.txt   can   can                   28                 31  MD
+## 10 text_01.txt leave leave                   32                 37  VB&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;snlp_n &amp;lt;- st_tok %&amp;gt;% group_by(id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Tokens
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_lemma
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+317
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+168
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+147
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+521
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+276
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+243
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+680
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+259
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+222
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+207
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+187
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+373
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+184
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+161
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;comparisons&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;4&lt;/span&gt; . Comparisons&lt;/h1&gt;
+&lt;p&gt;So far, I have obtained word tokens and types using four different methods. I also ran the texts in AntConc and Wordsmith, which are not described here.&lt;/p&gt;
+&lt;div id=&#34;tokens&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;4.1&lt;/span&gt; . Tokens&lt;/h2&gt;
+&lt;p&gt;Let’s look at the number of tokens that the different methods of analysis/software produced.&lt;/p&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+quanteda
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tidytext
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+cnlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+snlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+antconc
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+wordsmith
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+316
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+317
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+317
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+289
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+517
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+525
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+521
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+490
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+680
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+351
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+372
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+342
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+375
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+373
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+343
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+341
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The fact that the numbers are similar among tidytext, antconc, and wordsmith suggests that AntConc and Wordsmith do not include punctuation in their word count, which makes sense. cnlp and snlp currently include punctuation so I will remove them and recalculate the tokens and types.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_n &amp;lt;- cnlp_tok %&amp;gt;% filter(!upos %in% c(&amp;quot;PUNCT&amp;quot;, &amp;quot;SYM&amp;quot;, &amp;quot;NUM&amp;quot;)) %&amp;gt;% 
+    group_by(id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))
+
+#create a list of POS tags to exclude 
+except &amp;lt;- c(&amp;quot;,&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;``&amp;quot;, &amp;quot;&amp;#39;&amp;#39;&amp;quot;, &amp;quot;:&amp;quot;, &amp;quot;#&amp;quot;, &amp;quot;$&amp;quot;, &amp;quot;-LRB-&amp;quot;, &amp;quot;-RRB-&amp;quot;, &amp;quot;CD&amp;quot;)
+
+snlp_n &amp;lt;- st_tok %&amp;gt;% filter(!POS  %in% except) %&amp;gt;% 
+    group_by(id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+quanteda
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tidytext
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+cnlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+snlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+antconc
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+wordsmith
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+316
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+286
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+285
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+289
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+517
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+483
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+490
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+620
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+619
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+349
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+349
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+351
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+372
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+342
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+337
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+336
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+343
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+341
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Now the results look very similar except for those from &lt;code&gt;quanteda&lt;/code&gt;. The differences could be resulting from how contractions, numbers, and non-characters are accounted for. These numbers are also slightly different from the word count from Microsoft Word, but close enough.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;types&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;4.2&lt;/span&gt; . Types&lt;/h2&gt;
+&lt;p&gt;The number of unique words is interesting because even though I have removed punctuation marks, there are some differences between tidytext and cnlp/snlp:&lt;/p&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+quanteda
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tidytext
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+cnlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+snlp
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+162
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+155
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+159
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+158
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+265
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+267
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+265
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+248
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+245
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+254
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+254
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+199
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+190
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+193
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+193
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+177
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+173
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+175
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+174
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Next, I compared the unique lemma types. Right off the bat, quanteda’s type is visibly deviant from others so I would not trust that. There are two patterns: numbers obtained from AntConc and Wordsmith are very similar, and the numbers from tidytext, cnlp (spacy), and snlp (Stanford CoreNLP) are very close to one another. The numbers of these two groups are also different enough to assume that the number of unique lemma is not how word type is computed in conventional software.&lt;/p&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+quanteda
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tidytext
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+cnlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+snlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+antconc
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+wordsmith
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+167
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+140
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+137
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+137
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+156
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+155
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+276
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+233
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+227
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+231
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+261
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+214
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+215
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+217
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+245
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+245
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+205
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+175
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+170
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+173
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+188
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+189
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+183
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+157
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+150
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+151
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+174
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+173
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;While, conceptually, one might think that the words “sentence” and “sentences” are the same word, tokens include different forms of the same lemma. For instance, “am”, “are”, “was”, “were” are four tokens.&lt;/p&gt;
+&lt;p&gt;Tokens from AntConc and Wordsmith are different from the number of unique words shown above, with the results from NLP being slightly larger. I suspect that how numbers and contractions are treated has something to do with this. In NLP, contractions become separated: For example, “shouldn’t” becomes two words, “should” and “not”. In AntConc, “shouldn’t” becomes “shouldn” and “t”. Therefore “should” and “shouldn” are two types. In Wordsmith, “shouldn’t” is just one word.&lt;/p&gt;
+&lt;p&gt;Obtaining tokens and types by file has so far been the easiest with Wordsmith, but the software requires purchase. AntConc is freely avilable, but doesn’t analyze text by text when there is a batch of files to process. In my quest to examine and compare how the tokens and types differ by software, I found that using &lt;code&gt;tidytext&lt;/code&gt; was the simplest yet reliable in computing word tokens and types.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
