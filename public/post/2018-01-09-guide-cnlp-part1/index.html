@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.4.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Susie Kim">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="1 . Installing Python1.1 . Download Python1.2 . Install Python1.3 . Test if Python works2 . Installing NLP backend: spaCy2.1 . Install spacy2.2 . Download language models3 . Getting ready with RStudio3.1 . Install all requirements3.2 . Processing a text stringThis is Part 1 of a basic guide for setting up and using a natural language processing (NLP) tool with R.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#333333">
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github-gist.min.css" crossorigin="anonymous" title="hl-light">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github-gist.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+      
+    
+
+    
+
+    
+
+  
+
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:400,700|Mukta:400,400italic,700|Fira+Mono&display=swap">
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://susie-kim.github.io/css/academic.min.e4789924e1edd10d1259daec24089d9e.css">
+
+  
+
+  
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-131357983-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="https://www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+  
+
+  
+
+  <link rel="manifest" href="https://susie-kim.github.io/index.webmanifest">
+  <link rel="icon" type="image/png" href="https://susie-kim.github.io/img/icon-32.png">
+  <link rel="apple-touch-icon" type="image/png" href="https://susie-kim.github.io/img/icon-192.png">
+
+  <link rel="canonical" href="https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/">
+
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Susie Kim">
+  <meta property="og:url" content="https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/">
+  <meta property="og:title" content="A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP | Susie Kim">
+  <meta property="og:description" content="1 . Installing Python1.1 . Download Python1.2 . Install Python1.3 . Test if Python works2 . Installing NLP backend: spaCy2.1 . Install spacy2.2 . Download language models3 . Getting ready with RStudio3.1 . Install all requirements3.2 . Processing a text stringThis is Part 1 of a basic guide for setting up and using a natural language processing (NLP) tool with R."><meta property="og:image" content="https://susie-kim.github.io/img/icon-192.png">
+  <meta property="twitter:image" content="https://susie-kim.github.io/img/icon-192.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2018-01-09T16:10:46-05:00">
+    
+    <meta property="article:modified_time" content="2018-01-09T16:10:46-05:00">
+  
+
+  
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/"
+    },
+    "headline": "A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP",
+    
+    "datePublished": "2018-01-09T16:10:46-05:00",
+    "dateModified": "2018-01-09T16:10:46-05:00",
+    
+    "author": {
+      "@type": "Person",
+      "name": "Susie Kim"
+    },
+    
+    "description": "1 . Installing Python\r1.1 . Download Python\r1.2 . Install Python\r1.3 . Test if Python works\r\r2 . Installing NLP backend: spaCy\r2.1 . Install spacy\r2.2 . Download language models\r\r3 . Getting ready with RStudio\r3.1 . Install all requirements\r3.2 . Processing a text string\r\r\r\rThis is Part 1 of a basic guide for setting up and using a natural language processing (NLP) tool with R."
+  }
+</script>
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP | Susie Kim</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+<nav class="navbar navbar-light fixed-top navbar-expand-lg py-0 compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+      <a class="navbar-brand" href="https://susie-kim.github.io/">Susie Kim</a>
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+    
+    <div class="collapse navbar-collapse" id="navbar">
+
+      
+      
+      <ul class="navbar-nav ml-auto">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="https://susie-kim.github.io/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link  active" href="https://susie-kim.github.io/post/"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="https://susie-kim.github.io/#projects"><span>Projects</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="https://susie-kim.github.io/#teaching"><span>Teaching</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="https://susie-kim.github.io/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+
+        
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP</h1>
+
+  
+
+  
+    
+
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Jan 9, 2018
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    10 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="https://susie-kim.github.io/categories/r/">R</a>, <a href="https://susie-kim.github.io/categories/corpus/">Corpus</a></span>
+  
+
+  
+    
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/&amp;text=A%20basic%20guide%20to%20using%20NLP%20for%20corpus%20analysis%20with%20R%20%28Part%201%29:%20Installing%20Python,%20spacy,%20and%20cleanNLP" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/&amp;t=A%20basic%20guide%20to%20using%20NLP%20for%20corpus%20analysis%20with%20R%20%28Part%201%29:%20Installing%20Python,%20spacy,%20and%20cleanNLP" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=A%20basic%20guide%20to%20using%20NLP%20for%20corpus%20analysis%20with%20R%20%28Part%201%29:%20Installing%20Python,%20spacy,%20and%20cleanNLP&amp;body=https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/&amp;title=A%20basic%20guide%20to%20using%20NLP%20for%20corpus%20analysis%20with%20R%20%28Part%201%29:%20Installing%20Python,%20spacy,%20and%20cleanNLP" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=A%20basic%20guide%20to%20using%20NLP%20for%20corpus%20analysis%20with%20R%20%28Part%201%29:%20Installing%20Python,%20spacy,%20and%20cleanNLP%20https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/&amp;title=A%20basic%20guide%20to%20using%20NLP%20for%20corpus%20analysis%20with%20R%20%28Part%201%29:%20Installing%20Python,%20spacy,%20and%20cleanNLP" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+<div id="TOC">
+<ul>
+<li><a href="#installing-python"><span class="toc-section-number">1</span> . Installing Python</a><ul>
+<li><a href="#download-python"><span class="toc-section-number">1.1</span> . Download Python</a></li>
+<li><a href="#install-python"><span class="toc-section-number">1.2</span> . Install Python</a></li>
+<li><a href="#test-if-python-works"><span class="toc-section-number">1.3</span> . Test if Python works</a></li>
+</ul></li>
+<li><a href="#installing-nlp-backend-spacy"><span class="toc-section-number">2</span> . Installing NLP backend: spaCy</a><ul>
+<li><a href="#install-spacy"><span class="toc-section-number">2.1</span> . Install spacy</a></li>
+<li><a href="#download-language-models"><span class="toc-section-number">2.2</span> . Download language models</a></li>
+</ul></li>
+<li><a href="#getting-ready-with-rstudio"><span class="toc-section-number">3</span> . Getting ready with RStudio</a><ul>
+<li><a href="#install-all-requirements"><span class="toc-section-number">3.1</span> . Install all requirements</a></li>
+<li><a href="#processing-a-text-string"><span class="toc-section-number">3.2</span> . Processing a text string</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>This is Part 1 of a basic guide for setting up and using a natural language processing (NLP) tool with R. I specifically utilze the spaCy “industrial strength natural language processing” Python library, and an R wrapper called <a href="https://statsmaths.github.io/cleanNLP/">cleanNLP</a> that provides tools for annotating texts and obtaining data tables. In this post, I will explain step-by-step how to get ready to work with text data using these two packages, and a snippet of what they can do.</p>
+<p>I decided to write this post because for someone like me who has no background in computer science but wants to get their feet wet with NLP. It could be difficult to get started with these tools because you don’t know where to start or what to exactly look for. I have not yet seen any webpages that describe what I’m trying to do all in one place. It took a while for me to hunt down the information that I needed to carry out the kind of analyses that I wanted to do, and took many failed attempts to finally get the computer programs working. SpaCy and cleanNLP utilized in R have so far been the easiest to learn and work with in my experience as a beginner.</p>
+<p>In this post, I assume you have some experience with R, but you should be able to follow along (though might not be able to understand what’s going on exactly) even if you haven’t used it before.</p>
+<p>In case you need to install R and RStudio:<br />
+<a href="https://cran.r-project.org/bin/windows/base/">Download R for Windows</a><br />
+<a href="https://www.rstudio.com/products/rstudio/download/">Download RStudio</a></p>
+<p>Before you begin, check your computer system environment and compare it with mine. My guidelines might not work in your setting and you might experience issues that I don’t mention here (use Google search!). My system environment is: Windows 10 64-bit operating system.</p>
+<div id="installing-python" class="section level1">
+<h1><span class="header-section-number">1</span> . Installing Python</h1>
+<p>If you have never installed Python on your computer, great. You start with a clean slate and it might work the best. If you already have Python installed (must be Python 2.7 and up) but not sure if it works, skip to the end of this section (1.3) to test it.</p>
+<p>Here, I’m installing the latest version of Python, 3.6.4, which works with my OS. If you don’t use Python for anything else, just following these instructions will probably be your best bet. There are different ways to install Python, for example, using <a href="https://www.anaconda.com/download/">Anaconda</a> which provides GUI and may be better in the long run, but I won’t use it here.</p>
+<div id="download-python" class="section level2">
+<h2><span class="header-section-number">1.1</span> . Download Python</h2>
+<p>First step, download Python from <a href="https://www.python.org/downloads/windows/">here</a> link for Windows. Make sure to get an installer that matches your operating system and R. In other words, if you have 32-bit R installed, download the 32-bit version (labelled “Windows x86”). With 64-bit R, download 64-bit Python (labelled “Windows x86-64”).</p>
+</div>
+<div id="install-python" class="section level2">
+<h2><span class="header-section-number">1.2</span> . Install Python</h2>
+<p>After the download is complete, execute the installer. Two important things. First, check the box that says “add to PATH” when you see it. For Python 2.7.x, this option has a different appearance - not as a checkbox but an icon to click somewhere during the setup. If you have accidentally neglected to check the “add to PATH” box, you will need to manually add the path for Python to the system environment variables (but it might be difficult to find what works for your system so you might as well just uninstall, reboot, and reinstall, enabling the above-mentioned option). Second, I recommend just use the default directory provided as the location. In my case, Python did not work properly when I installed it under a different location.</p>
+</div>
+<div id="test-if-python-works" class="section level2">
+<h2><span class="header-section-number">1.3</span> . Test if Python works</h2>
+<p>Open up a Command Prompt by searching “command …” or “cmd” from the windows start menu. Preferably, open the program by right-clicking the mouse and selecting “run as administrator”. If you don’t run it as admin, it’s fine for now but you have to run it as admin when you execute Section 2.2 Download language models.</p>
+<p>Type <code>python</code> and hit enter.</p>
+<p>Your installation was successful if you see something like this:<br />
+&gt; Python 3.6:d48eceb, Dec 19 2017, 06:54:40 64 bit (AMD64)] on win32
+&gt; Type “help”, “copyright”, “credits” or “license” for more information.</p>
+<p>If you get a message that says “python is not recognized as internal or external command”, which I don’t think you will, as long as you have followed the instructions exactly so far, it means trouble. If you don’t know well about these issues, the simplest solution is to uninstall, reboot, and reinstall. Hopefully you have not encountered any issues and have Python up and running now.</p>
+<p>Now type in <code>exit()</code> to move on to installing spaCy.</p>
+</div>
+</div>
+<div id="installing-nlp-backend-spacy" class="section level1">
+<h1><span class="header-section-number">2</span> . Installing NLP backend: spaCy</h1>
+<p>To put it very simply, spaCy is a library that processes and analyzes languages. CleanNLP utilizes this specific Python library. Another option with cleanNLP is coreNLP (Java). I find spaCy lighter and easier to set up than coreNLP (a point also noted by the creators). Here I only demonstrate installing spaCy. See the “Backends” section from <a href="https://statsmaths.github.io/cleanNLP/">here</a> for more information related to this.</p>
+<div id="install-spacy" class="section level2">
+<h2><span class="header-section-number">2.1</span> . Install spacy</h2>
+<p>In your Command Prompt, enter the following code:<br />
+<code>pip install -U spacy</code></p>
+<p>It can take several minutes to finish installing. If it fails to install with the error message that says Microsoft Visual C++ 14.0 is required, go download <a href="https://visualstudio.microsoft.com/visual-cpp-build-tools/">Visual C++ Build Tools</a> and retry.</p>
+</div>
+<div id="download-language-models" class="section level2">
+<h2><span class="header-section-number">2.2</span> . Download language models</h2>
+<p>Next step is to install the language models (as in Python packages) that you want. SpaCy provides packages for a number of languages: see <a href="https://spacy.io/usage/models">the models</a> for languages other than English. In this example, I will install English models that I will use to process texts in English. One thing to note is that within English, different models are offered. Go to this page and scroll down to read about the models. The larger the model is, the more accurate it is, though the differences don’t seem to be that big.</p>
+<p>Enter the following code to the command line:<br />
+<code>python -m spacy download en_core_web_sm</code></p>
+<p>The default model is <a href="https://spacy.io/models/en#en_core_web_sm">en_core_web_sm</a>. You can install multiple models if you wish. I installed the largest model:<br />
+<code>python -m spacy download en_core_web_lg</code></p>
+<p>If you see an error message saying that linking was unsuccessful, it could be because you didn’t run the Command as administrator.</p>
+<p>After downloading and linking is complete, test if the installed modules work by trying the following codes, one line at a time:<br />
+<code>python</code>
+<code>import spacy</code><br />
+<code>nlp = spacy.load('en_core_web_sm')</code><br />
+<code>doc = nlp(u'This is a sentence.')</code><br />
+<code>print(doc)</code></p>
+<p>Did the last code return “This is a sentence.”? If yes, yay! - it’s probably safe to assume everything is running smoothly. Quit the Command Prompt and start RStudio. (Restart RStudio if you have had it open while installing spacy.)</p>
+</div>
+</div>
+<div id="getting-ready-with-rstudio" class="section level1">
+<h1><span class="header-section-number">3</span> . Getting ready with RStudio</h1>
+<div id="install-all-requirements" class="section level2">
+<h2><span class="header-section-number">3.1</span> . Install all requirements</h2>
+<p>This portion has been updated on December 21, 2018 to accommodate changes made to the cleanNLP package.</p>
+<p>Create a new R script. The required packages for cleanNLP are:</p>
+<pre class="r"><code>#install packages: cleanNLP, reticulate
+install.packages(&quot;cleanNLP&quot;); install.packages(&quot;reticulate&quot;)</code></pre>
+<pre class="r"><code>#load the packages
+library(cleanNLP)
+library(reticulate)</code></pre>
+<p>To get started with processing texts, you need to initialize spacy:</p>
+<pre class="r"><code>#initalized the NLP backend
+cnlp_init_spacy(model_name = &quot;en_core_web_sm&quot;)</code></pre>
+<p>Now, if this doesn’t work, try the following code to see whether there’s any problems with Python configuration on your computer.</p>
+<pre class="r"><code>#check your Python configuration
+py_config()
+## python:         C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\python.exe
+## libpython:      C:/Users/susie.DESKTOP-TF1TRHP/AppData/Local/Programs/Python/Python37/python37.dll
+## pythonhome:     C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37
+## version:        3.7.4 (tags/v3.7.4:e09359112e, Jul  8 2019, 20:34:20) [MSC v.1916 64 bit (AMD64)]
+## Architecture:   64bit
+## numpy:          C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\lib\site-packages\numpy
+## numpy_version:  1.17.2
+## 
+## python versions found: 
+##  C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\python.exe
+##  C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\\python.exe</code></pre>
+<p>A little anecdote is that when I first tested the automatic annotation, I used a line from “The Stairway to Heaven”: “There’s a lady who’s sure all that glitters is gold, and she’s buying a stairway to heaven.” The default model, the small and medium sized models marked “glitters” as a noun. The large model marked the word correctly as a verb. After seeing this, I’ve been using the large model.</p>
+</div>
+<div id="processing-a-text-string" class="section level2">
+<h2><span class="header-section-number">3.2</span> . Processing a text string</h2>
+<p>This section will serve as a simple test and demonstration of the basic use of the cleanNLP package. It is based on the procedure described on the <a href="https://statsmaths.github.io/cleanNLP/">cleanNLP webpage</a></p>
+<pre class="r"><code>#make up a text
+text &lt;- &quot;Let me be the one you call. If you jump, I&#39;ll break your fall.&quot;</code></pre>
+<p>Now we have a text to analyze. Give R a command to automatically annotate the text.</p>
+<pre class="r"><code>#run the annotator
+obj &lt;- cnlp_annotate(text)</code></pre>
+<p>Now you should have new data named <code>obj</code>. It’s populated with lists of various data. Let’s view this data table with annotated objects.</p>
+<pre class="r"><code>#view the annotated data
+cnlp_get_token(obj)
+##      id sid tid  word  lemma  upos  pos cid
+## 2  doc1   1   1   Let    let  VERB   VB   0
+## 3  doc1   1   2    me -PRON-  PRON  PRP   4
+## 4  doc1   1   3    be     be  VERB   VB   7
+## 5  doc1   1   4   the    the   DET   DT  10
+## 6  doc1   1   5   one    one  NOUN   NN  14
+## 7  doc1   1   6   you -PRON-  PRON  PRP  18
+## 8  doc1   1   7  call   call  VERB  VBP  22
+## 9  doc1   1   8     .      . PUNCT    .  26
+## 11 doc1   2   1    If     if   ADP   IN  28
+## 12 doc1   2   2   you -PRON-  PRON  PRP  31
+## 13 doc1   2   3  jump   jump  VERB  VBP  35
+## 14 doc1   2   4     ,      , PUNCT    ,  39
+## 15 doc1   2   5     I -PRON-  PRON  PRP  41
+## 16 doc1   2   6 \\&#39;ll   will   AUX   MD  42
+## 17 doc1   2   7 break  break  VERB   VB  46
+## 18 doc1   2   8  your -PRON-   DET PRP$  52
+## 19 doc1   2   9  fall   fall  NOUN   NN  57
+## 20 doc1   2  10     .      . PUNCT    .  61</code></pre>
+<p>The table returns rows consisted of information regarding each token. Here are some detailed descriptions of what each column means:</p>
+<ul>
+<li><strong>id</strong>: Text id. Here ’id’s are all 1 because there is one text source.</li>
+<li><strong>sid</strong>: Sentence id (or sentence number) nested under ‘id’. We can see that we have 2 sentences in this text.</li>
+<li><strong>tid</strong>: Token id nested under ‘sid’. Note that for each sentence, ‘tid’ starts from 0 to mark ‘ROOT’, which indicates the start of a sentence. The default code hides the 0s, but they are there, and will be useful for corpus analysis.</li>
+<li><strong>word</strong>: The raw word as is in the source text.</li>
+<li><strong>lemma</strong>: The basic form of the token with no morphological changes.</li>
+<li><strong>upos</strong>: Universal part-of-speech, more general than ‘pos’.</li>
+<li><strong>pos</strong>: Language specific part-of-speech. For example, you can see tokens that are labelled as ‘VERB’ under the ‘upos’ column are further specified into verb infinitive (VB), verb present tense (VBP), and modal verbs (MD).</li>
+</ul>
+<p>See <code>?cnlp_get_token</code> for more information.</p>
+<p>Here is another data table you might be interested in:</p>
+<pre class="r"><code>cnlp_get_dependency(obj)
+##      id sid tid tid_target relation relation_full
+## 1  doc1   1   0          1     ROOT            NA
+## 2  doc1   1   3          2    nsubj            NA
+## 3  doc1   1   1          3    ccomp            NA
+## 4  doc1   1   5          4      det            NA
+## 5  doc1   1   3          5     attr            NA
+## 6  doc1   1   7          6    nsubj            NA
+## 7  doc1   1   5          7    relcl            NA
+## 8  doc1   1   1          8    punct            NA
+## 9  doc1   2   3          1     mark            NA
+## 10 doc1   2   3          2    nsubj            NA
+## 11 doc1   2   7          3    advcl            NA
+## 12 doc1   2   7          4    punct            NA
+## 13 doc1   2   7          5    nsubj            NA
+## 14 doc1   2   7          6      aux            NA
+## 15 doc1   2   0          7     ROOT            NA
+## 16 doc1   2   9          8     poss            NA
+## 17 doc1   2   7          9     dobj            NA
+## 18 doc1   2   7         10    punct            NA</code></pre>
+<p>This data frame contains annotations produced by grammatically parsing the text. In other words, they describe what roles the elements serve in each sentence. Though it is valuable information, I’m skeptical as to how accurate this parser is with learner language, so I won’t be dealing with this feature as much.</p>
+<p>This concludes Part 1 of the series. In Part 2, I will go through how to process text files - single file, multiple files, and all files under a specific directory. Please contact me if you have any questions, corrections, or suggestions!</p>
+</div>
+</div>
+
+    </div>
+
+    
+
+
+    
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="https://susie-kim.github.io/tags/corpus/">corpus</a>
+  
+  <a class="badge badge-light" href="https://susie-kim.github.io/tags/cleannlp/">cleannlp</a>
+  
+  <a class="badge badge-light" href="https://susie-kim.github.io/tags/spacy/">spacy</a>
+  
+  <a class="badge badge-light" href="https://susie-kim.github.io/tags/nlp/">nlp</a>
+  
+</div>
+
+
+
+    
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  <div class="media author-card" itemscope itemtype="http://schema.org/Person">
+    
+
+    <div class="media-body">
+      <h5 class="card-title" itemprop="name"><a href="https://susie-kim.github.io/">Susie Kim</a></h5>
+      <h6 class="card-subtitle">Lecturer in Korean Language</h6>
+      <p class="card-text" itemprop="description">My research interests include distributed robotics, mobile computing and programmable matter.</p>
+      <ul class="network-icon" aria-hidden="true">
+        
+          
+          
+          
+            
+          
+          
+          
+          
+          
+            
+          
+          <li>
+            <a itemprop="sameAs" href="https://susie-kim.github.io/#contact" >
+              <i class="fas fa-envelope"></i>
+            </a>
+          </li>
+        
+          
+          
+          
+            
+          
+          
+          
+          
+          
+            
+          
+          <li>
+            <a itemprop="sameAs" href="https://twitter.com/" target="_blank" rel="noopener">
+              <i class="fab fa-twitter"></i>
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          
+          
+            
+          
+          <li>
+            <a itemprop="sameAs" href="https://scholar.google.co.uk/" target="_blank" rel="noopener">
+              <i class="ai ai-google-scholar"></i>
+            </a>
+          </li>
+        
+          
+          
+          
+            
+          
+          
+          
+          
+          
+            
+          
+          <li>
+            <a itemprop="sameAs" href="https://github.com/susie-kim" target="_blank" rel="noopener">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+
+
+      
+      
+    
+
+    
+
+    
+<section id="comments">
+  
+    
+<div id="disqus_thread"></div>
+<script>
+  let disqus_config = function () {
+    
+    
+    
+  };
+  (function() {
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+      return;
+    }
+    var d = document, s = d.createElement('script'); s.async = true;
+    s.src = 'https://' + "susiekim" + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+  
+</section>
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/languages/r.min.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/languages/yaml.min.js"></script>
+        
+      
+
+      
+      
+    
+
+    
+    
+
+    
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script>
+      const search_index_filename = "/index.json";
+      const i18n = {
+        'placeholder': "Search...",
+        'results': "results found",
+        'no_results': "No results found"
+      };
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="https://susie-kim.github.io/js/academic.min.16bbb3750feb7244c9bc409a5a4fe678.js"></script>
+
+    
+
+
+
+
+
+
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    &copy; 2019 &middot; 
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

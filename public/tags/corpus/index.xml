@@ -1,0 +1,1576 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>corpus | Susie Kim</title>
+    <link>https://susie-kim.github.io/tags/corpus/</link>
+      <atom:link href="https://susie-kim.github.io/tags/corpus/index.xml" rel="self" type="application/rss+xml" />
+    <description>corpus</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Tue, 25 Dec 2018 20:00:00 -0500</lastBuildDate>
+    <image>
+      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <title>corpus</title>
+      <link>https://susie-kim.github.io/tags/corpus/</link>
+    </image>
+    
+    <item>
+      <title>Comparing tools for obtaining word token and type</title>
+      <link>https://susie-kim.github.io/post/2018-12-25-token-type/</link>
+      <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
+      <guid>https://susie-kim.github.io/post/2018-12-25-token-type/</guid>
+      <description>
+&lt;script src=&#34;https://susie-kim.github.io/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#text-files&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1&lt;/span&gt; . Text files&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#working-with-r-packages&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2&lt;/span&gt; . Working with R packages&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#quanteda&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2.1&lt;/span&gt; . Quanteda&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#tidytext&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2.2&lt;/span&gt; . Tidytext&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#results-from-natural-language-processing-tools&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3&lt;/span&gt; . Results from Natural Language Processing Tools&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#spacy&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.1&lt;/span&gt; . spacy&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#stanford-corenlp&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.2&lt;/span&gt; . Stanford CoreNLP&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#comparisons&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;4&lt;/span&gt; . Comparisons&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#tokens&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;4.1&lt;/span&gt; . Tokens&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#types&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;4.2&lt;/span&gt; . Types&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;When analyzing texts in any context, the most basic linguistic characteristics of the corpus (i.e., texts) to describe are word tokens (i.e., the number of words) and types (i.e., the number of distinct words). These numbers, however, will be slightly different depending on which software you use. I wanted to compare different options for obtaining the number of tokens and types.&lt;/p&gt;
+&lt;p&gt;In this post, I use the R packages &lt;code&gt;quanteda&lt;/code&gt;, &lt;code&gt;tidytext&lt;/code&gt; + &lt;code&gt;textstem&lt;/code&gt;, the NLP engines that I have introduced in this blog (spacy and Stanford CoreNLP), and popular software, AntConc and Wordsmith (version 7), for such comparison.&lt;/p&gt;
+&lt;div id=&#34;text-files&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;1&lt;/span&gt; . Text files&lt;/h1&gt;
+&lt;p&gt;I have randomly chosen five essays from &lt;a href=&#34;https://uclouvain.be/en/research-institutes/ilc/cecl/locness.html&#34;&gt;LOCNESS&lt;/a&gt; to use in as examples.&lt;/p&gt;
+&lt;p&gt;I prefer using the package &lt;code&gt;readtext&lt;/code&gt; to build a raw corpus. It will create a data table with the document ID and text in two separate columns for each file. I named the corpus object &lt;code&gt;txt&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(readtext)
+txt &amp;lt;- readtext(&amp;quot;corpus/*.txt&amp;quot;)
+head(txt)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## readtext object consisting of 5 documents and 0 docvars.
+## # Description: df[,2] [5 x 2]
+##   doc_id      text               
+## * &amp;lt;chr&amp;gt;       &amp;lt;chr&amp;gt;              
+## 1 text_01.txt &amp;quot;\&amp;quot;Two men, o\&amp;quot;...&amp;quot;
+## 2 text_02.txt &amp;quot;\&amp;quot;I am not a\&amp;quot;...&amp;quot;
+## 3 text_03.txt &amp;quot;\&amp;quot;Over the p\&amp;quot;...&amp;quot;
+## 4 text_04.txt &amp;quot;\&amp;quot;There is a\&amp;quot;...&amp;quot;
+## 5 text_05.txt &amp;quot;\&amp;quot;Boxing is \&amp;quot;...&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;working-with-r-packages&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;2&lt;/span&gt; . Working with R packages&lt;/h1&gt;
+&lt;div id=&#34;quanteda&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;2.1&lt;/span&gt; . Quanteda&lt;/h2&gt;
+&lt;p&gt;The package &lt;a href=&#34;https://github.com/quanteda/quanteda&#34;&gt;&lt;code&gt;quanteda&lt;/code&gt;&lt;/a&gt;, which stands for quantitative analysis of textual data, provides simple functions that compute the number of tokens, &lt;code&gt;ntoken()&lt;/code&gt;, and types &lt;code&gt;ntype()&lt;/code&gt;. This seems to be something quick and dirty.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(quanteda)
+
+ex &amp;lt;- &amp;quot;This is an example. Here is another example sentence, providing a couple short sentences.&amp;quot;
+
+ntoken(ex)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## text1 
+##    17&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ntype(tolower(ex))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## text1 
+##    14&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;ntoken&lt;/code&gt; says there are 17 tokens, which suggests that each word is counted including puncuation marks. &lt;code&gt;ntype&lt;/code&gt; says there are 14 types. I assume that these are: “this”, “is” (2), “an”, “example” (2), “.” (2), “here”, “another”, “sentence”, “,”, “providing”, “a”, “couple”, “short”, “sentences”. In other words, the &lt;code&gt;ntype&lt;/code&gt; function only considers the same exact words as one type. Therefore, the pairs “a” and “an” and “sentence” and “sentences”, appear as different two different types. This actually doesn’t agree with the definition of word type.&lt;/p&gt;
+&lt;p&gt;I already have the corpus &lt;code&gt;txt&lt;/code&gt;, but I can feed this into &lt;code&gt;quanteda&lt;/code&gt;’s &lt;code&gt;corpus()&lt;/code&gt; function to build its version of corpus. Calling summary, I can see the types and tokens in each text. The Type column must be computed differently through this process than through the &lt;code&gt;ntype()&lt;/code&gt; function, as I see different numbers. However, I’m not sure what causes such difference.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(quant_n &amp;lt;- summary(corpus(txt)))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Corpus consisting of 5 documents:
+## 
+##         Text Types Tokens Sentences
+##  text_01.txt   167    316        10
+##  text_02.txt   276    517        21
+##  text_03.txt   260    685        22
+##  text_04.txt   205    390        16
+##  text_05.txt   183    372        13
+## 
+## Source: D:/GitHub/susie-kim.github.io/content/post/* on x86-64 by susie
+## Created: Tue Sep 10 16:00:09 2019
+## Notes:&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The differences range from 5 to 12. I will append this result as &lt;code&gt;Type_word&lt;/code&gt; to the data table for later comparisons.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ntype(tolower(txt$text))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## text1 text2 text3 text4 text5 
+##   162   265   248   199   177&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is the summary of results from using the &lt;code&gt;quanteda&lt;/code&gt; package.&lt;/p&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Tokens
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_word
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+316
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+167
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+162
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+517
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+276
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+265
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+248
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+205
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+199
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+372
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+183
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+177
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div id=&#34;tidytext&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;2.2&lt;/span&gt; . Tidytext&lt;/h2&gt;
+&lt;p&gt;The package &lt;a href=&#34;https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html&#34;&gt;&lt;code&gt;tidytext&lt;/code&gt;&lt;/a&gt; includes a tokenizing function, &lt;code&gt;unnest_tokens()&lt;/code&gt;. It automatically removes punctuation marks. Therefore, the result will defintiely be different from the previous analysis.&lt;/p&gt;
+&lt;p&gt;I don’t think this package includes any lemmatizing functions so I turn to the &lt;code&gt;textstem&lt;/code&gt; package for this process. &lt;code&gt;lemmatize_words()&lt;/code&gt; litterally lemmatizes words, meaning that it returns the base form of each word. For instance, the word “men” is noted as “man” in the lemma column below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidytext); library(textstem); library(dplyr)
+
+tidy_text &amp;lt;- txt %&amp;gt;% 
+    unnest_tokens(word, text) %&amp;gt;% 
+    mutate(lemma = lemmatize_words(word))
+
+head(tidy_text, 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##         doc_id     word    lemma
+## 1  text_01.txt      two      two
+## 2  text_01.txt      men      man
+## 3  text_01.txt      one      one
+## 4  text_01.txt     ring     ring
+## 5  text_01.txt     only     only
+## 6  text_01.txt      one      one
+## 7  text_01.txt      can      can
+## 8  text_01.txt    leave    leave
+## 9  text_01.txt dramatic dramatic
+## 10 text_01.txt       it       it&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You can see from the code below that &lt;code&gt;Types_word&lt;/code&gt; is the number of unique words, and Types_lemma is the number of unique lemmas.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tidy_n &amp;lt;- tidy_text %&amp;gt;% 
+    group_by(doc_id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma))) %&amp;gt;% 
+    rename(id = doc_id)&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Tokens
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_lemma
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+155
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+140
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+233
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+245
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+214
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+190
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+175
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+342
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+173
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+157
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;results-from-natural-language-processing-tools&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;3&lt;/span&gt; . Results from Natural Language Processing Tools&lt;/h1&gt;
+&lt;div id=&#34;spacy&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.1&lt;/span&gt; . spacy&lt;/h2&gt;
+&lt;p&gt;For installation, see &lt;a href=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/&#34;&gt;my previous post on the topic&lt;/a&gt;.
+I annotate the corpus using the &lt;code&gt;cnlp_annotate&lt;/code&gt; function, which will perform tokenization, lemmatization, and tagging for parts-of-speech.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(cleanNLP); library(reticulate)
+
+cnlp_init_spacy(model_name = &amp;quot;en_core_web_lg&amp;quot;)
+cnlp_ann &amp;lt;- cnlp_annotate(txt)
+cnlp_tok &amp;lt;- cnlp_get_token(cnlp_ann)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(cnlp_tok, 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 10 x 8
+##    id            sid   tid word  lemma upos  pos     cid
+##    &amp;lt;chr&amp;gt;       &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;int&amp;gt;
+##  1 text_01.txt     1     1 Two   two   NUM   CD        0
+##  2 text_01.txt     1     2 men   man   NOUN  NNS       4
+##  3 text_01.txt     1     3 ,     ,     PUNCT ,         7
+##  4 text_01.txt     1     4 one   one   NUM   CD        9
+##  5 text_01.txt     1     5 ring  ring  NOUN  NN       13
+##  6 text_01.txt     1     6 ,     ,     PUNCT ,        17
+##  7 text_01.txt     1     7 only  only  ADV   RB       19
+##  8 text_01.txt     1     8 one   one   PRON  PRP      24
+##  9 text_01.txt     1     9 can   can   VERB  MD       28
+## 10 text_01.txt     1    10 leave leave VERB  VB       32&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here is the result from this data. I’ve included the number of unique words, which would presumably be equivalent to &lt;code&gt;quanteda&lt;/code&gt;’s &lt;code&gt;ntype&lt;/code&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_n &amp;lt;- cnlp_tok %&amp;gt;% 
+    group_by(id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Tokens
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_lemma
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+317
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+167
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+145
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+525
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+277
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+237
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+221
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+205
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+182
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+375
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+185
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+160
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div id=&#34;stanford-corenlp&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.2&lt;/span&gt; . Stanford CoreNLP&lt;/h2&gt;
+&lt;p&gt;To exercise this option, I utilzed the Stanford CoreNLP tool, the process of which is illustrated in &lt;a href=&#34;https://susie-kim.github.io/post/2018-04-06-guide-corenlp/&#34;&gt;this post&lt;/a&gt;. I have already processed the tfiles and only present the results here. The types of output I have genereated are the same as with the previous one.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(st_tok, 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##             id  word lemma CharacterOffsetBegin CharacterOffsetEnd POS
+## 1  text_01.txt   Two   two                    0                  3  CD
+## 2  text_01.txt   men   man                    4                  7 NNS
+## 3  text_01.txt     ,     ,                    7                  8   ,
+## 4  text_01.txt   one   one                    9                 12  CD
+## 5  text_01.txt  ring  ring                   13                 17  NN
+## 6  text_01.txt     ,     ,                   17                 18   ,
+## 7  text_01.txt  only  only                   19                 23  RB
+## 8  text_01.txt   one   one                   24                 27  CD
+## 9  text_01.txt   can   can                   28                 31  MD
+## 10 text_01.txt leave leave                   32                 37  VB&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;snlp_n &amp;lt;- st_tok %&amp;gt;% group_by(id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Tokens
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Types_lemma
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+317
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+168
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+147
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+521
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+276
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+243
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+680
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+259
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+222
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+207
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+187
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+373
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+184
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+161
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;comparisons&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;4&lt;/span&gt; . Comparisons&lt;/h1&gt;
+&lt;p&gt;So far, I have obtained word tokens and types using four different methods. I also ran the texts in AntConc and Wordsmith, which are not described here.&lt;/p&gt;
+&lt;div id=&#34;tokens&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;4.1&lt;/span&gt; . Tokens&lt;/h2&gt;
+&lt;p&gt;Let’s look at the number of tokens that the different methods of analysis/software produced.&lt;/p&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+quanteda
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tidytext
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+cnlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+snlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+antconc
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+wordsmith
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+316
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+317
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+317
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+289
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+517
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+525
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+521
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+490
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+680
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+351
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+372
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+342
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+375
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+373
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+343
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+341
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The fact that the numbers are similar among tidytext, antconc, and wordsmith suggests that AntConc and Wordsmith do not include punctuation in their word count, which makes sense. cnlp and snlp currently include punctuation so I will remove them and recalculate the tokens and types.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_n &amp;lt;- cnlp_tok %&amp;gt;% filter(!upos %in% c(&amp;quot;PUNCT&amp;quot;, &amp;quot;SYM&amp;quot;, &amp;quot;NUM&amp;quot;)) %&amp;gt;% 
+    group_by(id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))
+
+#create a list of POS tags to exclude 
+except &amp;lt;- c(&amp;quot;,&amp;quot;, &amp;quot;.&amp;quot;, &amp;quot;``&amp;quot;, &amp;quot;&amp;#39;&amp;#39;&amp;quot;, &amp;quot;:&amp;quot;, &amp;quot;#&amp;quot;, &amp;quot;$&amp;quot;, &amp;quot;-LRB-&amp;quot;, &amp;quot;-RRB-&amp;quot;, &amp;quot;CD&amp;quot;)
+
+snlp_n &amp;lt;- st_tok %&amp;gt;% filter(!POS  %in% except) %&amp;gt;% 
+    group_by(id) %&amp;gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+quanteda
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tidytext
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+cnlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+snlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+antconc
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+wordsmith
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+316
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+286
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+285
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+289
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+288
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+517
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+483
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+490
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+487
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+685
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+620
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+619
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+623
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+390
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+349
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+349
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+351
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+353
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+372
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+342
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+337
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+336
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+343
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+341
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Now the results look very similar except for those from &lt;code&gt;quanteda&lt;/code&gt;. The differences could be resulting from how contractions, numbers, and non-characters are accounted for. These numbers are also slightly different from the word count from Microsoft Word, but close enough.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;types&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;4.2&lt;/span&gt; . Types&lt;/h2&gt;
+&lt;p&gt;The number of unique words is interesting because even though I have removed punctuation marks, there are some differences between tidytext and cnlp/snlp:&lt;/p&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+quanteda
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tidytext
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+cnlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+snlp
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+162
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+155
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+159
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+158
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+265
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+267
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+265
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+248
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+245
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+254
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+254
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+199
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+190
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+193
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+193
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+177
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+173
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+175
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+174
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Next, I compared the unique lemma types. Right off the bat, quanteda’s type is visibly deviant from others so I would not trust that. There are two patterns: numbers obtained from AntConc and Wordsmith are very similar, and the numbers from tidytext, cnlp (spacy), and snlp (Stanford CoreNLP) are very close to one another. The numbers of these two groups are also different enough to assume that the number of unique lemma is not how word type is computed in conventional software.&lt;/p&gt;
+&lt;table class=&#34;table table-striped&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+quanteda
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tidytext
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+cnlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+snlp
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+antconc
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+wordsmith
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+167
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+140
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+137
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+137
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+156
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+155
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_02.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+276
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+233
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+227
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+231
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+261
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_03.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+260
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+214
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+215
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+217
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+245
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+245
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_04.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+205
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+175
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+170
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+173
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+188
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+189
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; background-color: gray80 !important;&#34;&gt;
+text_05.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+183
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+157
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+150
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+151
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+174
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;width: 10em; &#34;&gt;
+173
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;While, conceptually, one might think that the words “sentence” and “sentences” are the same word, tokens include different forms of the same lemma. For instance, “am”, “are”, “was”, “were” are four tokens.&lt;/p&gt;
+&lt;p&gt;Tokens from AntConc and Wordsmith are different from the number of unique words shown above, with the results from NLP being slightly larger. I suspect that how numbers and contractions are treated has something to do with this. In NLP, contractions become separated: For example, “shouldn’t” becomes two words, “should” and “not”. In AntConc, “shouldn’t” becomes “shouldn” and “t”. Therefore “should” and “shouldn” are two types. In Wordsmith, “shouldn’t” is just one word.&lt;/p&gt;
+&lt;p&gt;Obtaining tokens and types by file has so far been the easiest with Wordsmith, but the software requires purchase. AntConc is freely avilable, but doesn’t analyze text by text when there is a batch of files to process. In my quest to examine and compare how the tokens and types differ by software, I found that using &lt;code&gt;tidytext&lt;/code&gt; was the simplest yet reliable in computing word tokens and types.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Working with XML-formatted text annotations in R</title>
+      <link>https://susie-kim.github.io/post/2018-05-04-working-xml/</link>
+      <pubDate>Fri, 04 May 2018 10:34:40 -0500</pubDate>
+      <guid>https://susie-kim.github.io/post/2018-05-04-working-xml/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#from-xml-to-tagged-corpus&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1&lt;/span&gt; . From XML to tagged corpus&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#creating-tagged-text&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.1&lt;/span&gt; . Creating tagged text&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#rendering-xml-to-data-frame&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.2&lt;/span&gt; . Rendering xml to data frame&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#creating-tagged-texts&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.3&lt;/span&gt; . Creating tagged texts&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#example-query-and-concordances&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2&lt;/span&gt; . Example query and concordances&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In this post I’m documenting how to reformat the XML-formatted files outputted by the Stanford CoreNLP tool. This might not be the most elegant way to go about it, but this is something that works for me. Here, I will be using R and the XML files produced in the previous step.&lt;/p&gt;
+&lt;div id=&#34;from-xml-to-tagged-corpus&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;1&lt;/span&gt; . From XML to tagged corpus&lt;/h1&gt;
+&lt;div id=&#34;creating-tagged-text&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.1&lt;/span&gt; . Creating tagged text&lt;/h2&gt;
+&lt;p&gt;The files have been tokenized and POS-tagged using java in another platform. Here, I read in the annotated XML files and save them in a data frame with a row for each token ($token-node) and a column for each tag (variable) describing it.&lt;/p&gt;
+&lt;p&gt;First step, (install and) load the &lt;code&gt;XML&lt;/code&gt;, &lt;code&gt;dplyr&lt;/code&gt;, and &lt;code&gt;purrr&lt;/code&gt; libraries:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(XML); library(dplyr); library(purrr)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;rendering-xml-to-data-frame&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.2&lt;/span&gt; . Rendering xml to data frame&lt;/h2&gt;
+&lt;p&gt;Next, I will read in the files. My preference is that before I start, I move the XML files to a new folder (and XML files only), usually under the working directory that I have set for the current R session. I’ll call this new foler &lt;code&gt;xml&lt;/code&gt; (located under the “corpus” folder in the current working directory). The following codes will read the filenames and then change the working directory to the folder that contains these files. The codes that appear in the remainder of this post won’t work if you don’t change the working directory to where the XML files are. Specify your own folder in the parentheses.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Read the files
+files &amp;lt;- list.files(&amp;quot;corpus/xml&amp;quot;)
+setwd(&amp;quot;corpus/xml&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now this is a function that will 1) parse the XML and 2) extract the XML-values from the document. This is an adaptation from the codes I found from a &lt;a href=&#34;https://stackoverflow.com/questions/34627994/nested-xml-parsing-in-r&#34;&gt;Stack overflow post&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tags_df &amp;lt;- function(file){
+    message(&amp;quot;Loading &amp;quot;, file)
+    xlist &amp;lt;- file %&amp;gt;% xmlInternalTreeParse() %&amp;gt;% 
+        xmlRoot() %&amp;gt;% 
+        xpathSApply(&amp;quot;//token&amp;quot;, function(x) xmlSApply(x, xmlValue))
+    tags &amp;lt;- data.frame(t(xlist), row.names = NULL)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you remember the tree structure of these XML files, the information about each token is saved under the &lt;code&gt;token&lt;/code&gt; node. Therefore, I inserted the the argument &lt;code&gt;&#34;//token&#34;&lt;/code&gt;, which will create a data list that saves all values under this node (as realized by the xpath).&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;tags_df&lt;/code&gt; function will put out loading message for each file as it processes.&lt;/p&gt;
+&lt;p&gt;Currently, the information are stored in &lt;code&gt;all.tags&lt;/code&gt;, a list which is difficult to access. I will creat a data frame called &lt;code&gt;xml_df&lt;/code&gt; and save necessary token information there.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Create a data frame containing the tag information
+xml_df &amp;lt;- map(files, tags_df) %&amp;gt;% 
+    set_names(files) %&amp;gt;% 
+    bind_rows(.id = &amp;quot;id&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The above command applies the function &lt;code&gt;tags_df&lt;/code&gt;, which extracts information under the &lt;code&gt;//token&lt;/code&gt; node, to all xml files we have listed (i.e., &lt;code&gt;files&lt;/code&gt;). Then it binds the information from all files to one data frame.&lt;/p&gt;
+&lt;p&gt;Now, the data frame &lt;code&gt;xml_df&lt;/code&gt; should have each word in a row along with the POS and lemma associated with it in columns.&lt;/p&gt;
+&lt;p&gt;What I eventually want to do is to make everything a string so that I can search for sequences of words (e.g., may + verb infinitive) using regular expressions. The result I want is a list of sentences that include the specific sequence of words. To do this, I will need to separate sentences from the entire text.&lt;/p&gt;
+&lt;p&gt;The only way I know how to do this is to label each token its token ID. Token ID indicates the n-th word in each sentence. Therefore, whenever I have token ID #1, I know it is a new sentence. I will come back to this idea later.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Another function that retrieves the attribute information, which is the token ID
+tid_df &amp;lt;- function(file){
+    message(&amp;quot;Loading &amp;quot;, file)
+    xlist &amp;lt;- file %&amp;gt;%
+        xmlInternalTreeParse() %&amp;gt;% 
+        xmlRoot() %&amp;gt;% 
+        xpathSApply(&amp;quot;//tokens&amp;quot;, function(x) xmlSApply(x, xmlAttrs))
+    tids &amp;lt;- data.frame(t(xlist), row.names = NULL)
+    }
+
+# Create a data list of token IDs
+all_tids &amp;lt;- map(files, tid_df) %&amp;gt;% 
+    bind_rows()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Append the token IDs to the data frame xml_df
+xml_df$tid &amp;lt;- all_tids&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;creating-tagged-texts&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.3&lt;/span&gt; . Creating tagged texts&lt;/h2&gt;
+&lt;p&gt;Now that I have all the information I need in one place, I will save them as a text that looks something like this: &amp;lt;tid=“1”&amp;gt;&amp;lt;pos=“VB” lem=“do”&amp;gt;Do &amp;lt;tid=“2”&amp;gt;&amp;lt;pos=“ADV” lem=“not”&amp;gt;n’t &amp;lt;tid=“3”&amp;gt;&amp;lt;pos=“VB” lem=“be”&amp;gt;be …&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;text &amp;lt;- paste0(&amp;quot;&amp;lt;t=\&amp;quot;&amp;quot;, xml_df$tid, &amp;quot;\&amp;quot;&amp;gt;&amp;quot;, 
+               &amp;quot;&amp;lt;pos=\&amp;quot;&amp;quot;, xml_df$POS, &amp;quot;\&amp;quot; lem=\&amp;quot;&amp;quot;, xml_df$lemma, &amp;quot;\&amp;quot;&amp;gt;&amp;quot;, 
+               xml_df$word, collapse = &amp;quot; &amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I have the output now saved as &lt;code&gt;text&lt;/code&gt;. I will remove the token IDs (&amp;lt;t=“n”&amp;gt;) but replace all &amp;lt;t=“1”&amp;gt;s with &amp;lt;s&amp;gt; to mark the beginnings of sentences.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;text &amp;lt;- gsub(&amp;quot;&amp;lt;t=\&amp;quot;1\&amp;quot;&amp;gt;&amp;quot;, &amp;quot;\n&amp;lt;s&amp;gt;&amp;quot;, text, perl = TRUE)
+text &amp;lt;- gsub(&amp;quot;&amp;lt;t=\&amp;quot;.{1,2}\&amp;quot;&amp;gt;&amp;quot;, &amp;quot;&amp;quot;, text, perl = TRUE)
+
+write(text, &amp;quot;corpus.txt&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now I have a single text file that composites all texts I originally had, all tagged with POS and lemma, each sentence separated by a new line and the tag &amp;lt;s&amp;gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;example-query-and-concordances&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;2&lt;/span&gt; . Example query and concordances&lt;/h1&gt;
+&lt;p&gt;As an example, I will find sentences that include a grammatical structure, “may + verb infinitive”. This draws on Dr. Stephan Gries’ &lt;a href=&#34;http://www.linguistics.ucsb.edu/faculty/stgries/research/qclwr/qclwr.html&#34;&gt;Quantitative corpus linguistics with R&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Read the text file in
+corpus &amp;lt;- scan(&amp;quot;corpus.txt&amp;quot;, what = &amp;quot;char&amp;quot;, sep = &amp;quot;\n&amp;quot;, quiet = TRUE)
+
+# Change the text to lower case and save as &amp;#39;working_corpus&amp;#39;
+working_corpus &amp;lt;- tolower(corpus)
+
+# Parse the text into sentences and save it
+working_corpus &amp;lt;- grep(&amp;quot;&amp;lt;s&amp;gt;&amp;quot;, working_corpus, value = TRUE, perl = TRUE)
+
+# Extract the sentences that include &amp;quot;may + verb&amp;quot;
+find_matches &amp;lt;- grep(&amp;quot;&amp;lt;pos=\&amp;quot;md\&amp;quot; lem=\&amp;quot;may\&amp;quot;&amp;gt;[^&amp;lt;]* &amp;lt;pos=\&amp;quot;vb\&amp;quot; lem=\&amp;quot;[^&amp;lt;]*\&amp;quot;&amp;gt;[^&amp;lt;]*&amp;quot;, working_corpus, value = TRUE, perl = TRUE)
+
+# Remove the POS tags to get clean sentences
+clean_matches &amp;lt;- gsub(&amp;quot;&amp;lt;.*?&amp;gt;&amp;quot;, &amp;quot;&amp;quot;, find_matches, perl = TRUE)
+
+# Remove the space before punctuation
+clean_matches &amp;lt;- gsub(&amp;quot; (?=[.,!?])&amp;quot;, &amp;quot;&amp;quot;, clean_matches, perl = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;See the results - ta-da!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;print(clean_matches)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;dramatic it may be but basically that &amp;quot;                                                                                                                                                                                                                                                                     
+## [2] &amp;quot;without the large sums of money envolved boxing would be far more dangerous because the medical care would be poorer. so, those that say the money pushes these boxers to their fates may be wrong in thinking so because it &amp;quot;                                                                              
+## [3] &amp;quot;would be no supervision and professional referring so boxing accidents may occur and they may result worst than they do now, because there would be no immediate &amp;quot;                                                                                                                                          
+## [4] &amp;quot;of the most popular sports of this era, it is almost one of the most deadly. during a fight a boxer may receive several hundred punches to the head, and each time that he gets punched he looses more and more brain cells. the brain is encased in the skull, but not only in the skull is the brain but &amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Save the results as a file:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;write.csv(clean_matches, &amp;quot;matches.csv&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>A guide to using the Stanford CoreNLP Tools for automatic text annotation</title>
+      <link>https://susie-kim.github.io/post/2018-04-06-guide-corenlp/</link>
+      <pubDate>Fri, 06 Apr 2018 12:20:40 -0500</pubDate>
+      <guid>https://susie-kim.github.io/post/2018-04-06-guide-corenlp/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#stanford-corenlp-tools&#34;&gt;Stanford CoreNLP tools&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#parsing&#34;&gt;Parsing&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;As the title suggests, I will guide you through how to automatically annotate raw texts using the Stanford CoreNLP in this post.&lt;/p&gt;
+&lt;div id=&#34;stanford-corenlp-tools&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Stanford CoreNLP tools&lt;/h1&gt;
+&lt;p&gt;The Stanford CoreNLP is a set of natural language analysis tools written in Java programming language. It takes raw text input then tokenizes each word and parses them into the base forms of words (i.e., lemmas). The users can utilize this set of tools to further parse the text, such as tagging the parts of speech (i.e., POS tagging), marking the structure of sentences in terms of phrases or word dependencies.&lt;/p&gt;
+&lt;p&gt;Feeding the text and parsing it does not require much effort. In order to run the command lines on your computer, you need to have Java installed first. If you don’t already have it, you can download it from the &lt;a href=&#34;https://java.com/en/download/&#34;&gt;Java website&lt;/a&gt;. Once the installation is finished, the next step is to download the CoreNLP package. It can be downloaded from &lt;a href=&#34;https://stanfordnlp.github.io/CoreNLP/&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I have the 3.8.0 version, but as of now, the website offers version 3.9.1.
+After you download the zip file, extract them to a folder that you will remember. In this post, I will refer to this folder as “stanford-corenlp”.&lt;/p&gt;
+&lt;div id=&#34;parsing&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Parsing&lt;/h2&gt;
+&lt;p&gt;Before jumping into running the command lines, place the text files you want to parse under the “stanford-corenlp” folder. If you have multiple files, it’s better to create a new folder and place the text files there. There is an option to create a list of the files but I currently don’t see the need for it because it requires extra work to create the filelist. In my example, I have a folder called “corpus” that contains all the text files I want to process.&lt;/p&gt;
+&lt;p&gt;You are now ready to run the commands. Open the command propmt application on your computer (More information is available at the &lt;a href=&#34;https://stanfordnlp.github.io/CoreNLP/cmdline.html&#34;&gt;Stanford CoreNLP website&lt;/a&gt;.
+You only need two lines to parse the text you want. First, you want to navigate into your “stanford-corenlp” folder. Copy or type in the folder address as is set up on your computer after the command &lt;code&gt;cd&lt;/code&gt;:&lt;br /&gt;
+&lt;code&gt;cd C:/Users/Me/Documents/stanford-corenlp&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Your command prompt will now show you this in the beginning of a new line:&lt;br /&gt;
+&lt;code&gt;C:\Users\Me\Documents\stanford-corenlp&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;This is the command line that actually processes the text files:&lt;br /&gt;
+&lt;code&gt;java -cp &#34;*&#34; -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,lemma,parse -file corpus -outputDirectory corpus&lt;/code&gt;
+Note. This command should be in a single line&lt;/p&gt;
+&lt;p&gt;In this example, I have three specific commands:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;-annotators&lt;/code&gt;: this specifies what analysis you want to do. Here, I’m asking to tokenize the text(&lt;code&gt;tokenize&lt;/code&gt;), split sentences(&lt;code&gt;ssplit&lt;/code&gt;), tag parts of speech(&lt;code&gt;pos&lt;/code&gt;), annotate the base form of each token, in other words, lemmatize (&lt;code&gt;lemma&lt;/code&gt;), and mark the structure of sentences (&lt;code&gt;parse&lt;/code&gt;).
+You need to minimally include &lt;code&gt;tokenize&lt;/code&gt; and &lt;code&gt;ssplit&lt;/code&gt;. Otherwise, you will either get a blank output or get an error message.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;-file&lt;/code&gt;: identify where your text files are. If you have one specific text, you can provide the filename. For example, you’re processing a file named “test.txt” that is located under the stanford-corenlp folder, simply write the name of the file (without the quotation marks) after &lt;code&gt;-file&lt;/code&gt;: &lt;code&gt;-file test.txt&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;-outputDirectory&lt;/code&gt;: If you don’t specify the output directory, then the output file is automatically saved in the current base folder, stanford-corenlp. You can designate a folder as in my example.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;By default the output file format is XML, but others are available. You can add &lt;code&gt;-outputExtension&lt;/code&gt; followed by &lt;code&gt;text&lt;/code&gt;, &lt;code&gt;json&lt;/code&gt;, &lt;code&gt;conll&lt;/code&gt;, etc., whichever format you want and is supported.&lt;/p&gt;
+&lt;p&gt;You can find the annotated script from the &lt;a href=&#34;https://github.com/stanfordnlp/CoreNLP/blob/master/src/edu/stanford/nlp/pipeline/StanfordCoreNLP.java&#34;&gt;CoreNLP Github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When the processing is complete, by default, the annotated files are stored in the XML format. This stores information in a tree-like structure. The document will have branches of sentences. In the sentences node, you would have several sentence if this text is made up of multiple sentences. Under each sentence, you would also have tokens, and each token includes information about the lemma and POS.&lt;/p&gt;
+&lt;p&gt;There are different ways to find what you want from this file. I’m sure there are many others than what I know. In the next post, I will parse the tree structure and format the information in the way that allows for searches with regular expressions.&lt;/p&gt;
+&lt;p&gt;Feel free to leave a message or contact me if you have any questions or suggestions!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>A basic guide to using NLP for corpus analysis with R (Part 2): Processing text files</title>
+      <link>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2/</link>
+      <pubDate>Tue, 09 Jan 2018 16:20:46 -0500</pubDate>
+      <guid>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#processing-text-files&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1&lt;/span&gt; . Processing text files&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#annotate-a-single-text&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.1&lt;/span&gt; . Annotate a single text&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#annotate-all-files-in-a-folder&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.2&lt;/span&gt; . Annotate all files in a folder&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#describing-data&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2&lt;/span&gt; . Describing data&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#frequency-tables&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2.1&lt;/span&gt; . Frequency tables&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#basic-visualization&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2.2&lt;/span&gt; . Basic visualization&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;If you’re working with language data, you probably want to process text files rather than strings of words you type on to an R script. Here is how to deal with files. Refer to the previous post for setting the tools up if needed.&lt;/p&gt;
+&lt;div id=&#34;processing-text-files&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;1&lt;/span&gt; . Processing text files&lt;/h1&gt;
+&lt;p&gt;Place all text files that you want to process under the working directory. For example, currently my working directory is set as: &lt;code&gt;C:/my/working/directory/&lt;/code&gt;. The .txt files that I will process are in a folder named corpus under this working directory: &lt;code&gt;C:/my/working/directory/corpus&lt;/code&gt;. Before proceeding to the next part, load the &lt;code&gt;cleanNLP&lt;/code&gt; and &lt;code&gt;reticulate&lt;/code&gt; packages, and initiate spaCy by executing &lt;code&gt;cnlp_init_spacy&lt;/code&gt; and specifying the language model.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(cleanNLP); library(reticulate)
+cnlp_init_spacy(model_name = &amp;quot;en_core_web_lg&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;annotate-a-single-text&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.1&lt;/span&gt; . Annotate a single text&lt;/h2&gt;
+&lt;p&gt;Let’s say the name of the text file I want to analyze is: text_01.txt, and it’s in the corpus folder right under the working directory. Here is how to process this particular file:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#annotate a single file
+single.text &amp;lt;- cnlp_annotate(&amp;quot;corpus/text_01.txt&amp;quot;, as_strings = FALSE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It’s as simple as that. Setting &lt;code&gt;as_strings = FALSE&lt;/code&gt; lets the annotator know that the path provided is the name of a file, not actual text that’s waiting to be annotated.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;annotate-all-files-in-a-folder&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.2&lt;/span&gt; . Annotate all files in a folder&lt;/h2&gt;
+&lt;p&gt;Under the folder corpus, I actually have 5 text files and I’d like to process them all. Here is the code that will annotate all these files:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#annotate all .txt files in a folder
+all.text &amp;lt;- cnlp_annotate(&amp;quot;corpus/*.txt&amp;quot;, as_strings = FALSE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Again, simple! The package has annotated all .txt files under the folder corpus, and the results are saved in a data list named all.text. Something you might want to check at this point is whether all files in your folder are analyzed. Type and execute:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_get_document(all.text)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##     id                 time version       language                uri
+## 1 doc1 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_01.txt
+## 2 doc2 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_02.txt
+## 3 doc3 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_03.txt
+## 4 doc4 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_04.txt
+## 5 doc5 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_05.txt&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With this example, it shows 5 files that I’ve just processed. If you have more than 10 files, the console pane won’t display the entire list, so you might want to save this data table as a data frame to view it.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;texts.doc &amp;lt;- cnlp_get_document(all.text)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then of course you have all annotated objects that you can retrieve as I have previous talked about:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_get_token(all.text)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This might just be all you need and you can take it from here to analyze the results with this data with any other software. While we have R running, I will briefly look at some descriptive statistics by using R in the next section.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;describing-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;2&lt;/span&gt; . Describing data&lt;/h1&gt;
+&lt;p&gt;Because we now have the language data under investigation as a data table with words, lemmas, and part-of-speech tags, we can easily describe the this data in frequencies.&lt;/p&gt;
+&lt;div id=&#34;frequency-tables&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;2.1&lt;/span&gt; . Frequency tables&lt;/h2&gt;
+&lt;p&gt;The most interesting part of the data is included in the data frame token, so I’m saving it as a new data frame that I can easily access:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;t.data &amp;lt;- as.data.frame(all.text$token)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;There are many different ways to get desired information, but I will just stick to using the &lt;code&gt;table&lt;/code&gt; function for now. First, to see how many sentences there are in this data, remember that each sentence start is marked as “ROOT” when annotated? I’ll take advantage of that and type in:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;table(t.data$lemma==&amp;quot;ROOT&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## FALSE  TRUE 
+##  2292    95&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What I see now is a table with labels FALSE and TRUE in the console. The number associated with FALSE is the number of lemmas other than ROOT (hence actual tokens), and the one associated with TRUE is the number of ROOTs, in other words, sentences.&lt;/p&gt;
+&lt;p&gt;So here I have 93 sentences.&lt;/p&gt;
+&lt;p&gt;Use the following codes to see the frequencies of universal POS:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;table(t.data$upos)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##         ADJ   ADP   ADV   AUX CCONJ   DET  INTJ  NOUN   NUM  PART  PRON 
+##    95   166   238   188     2    83   294     1   473    21    50   106 
+## PROPN PUNCT   SYM  VERB     X 
+##    31   189     3   442     5&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After looking at the results, you will want to get rid of things tagged as “X”, punctuation, spaces, etc. unless you are interested in these features. An easy way to do it is to use the &lt;code&gt;filter&lt;/code&gt; function from &lt;code&gt;dplyr&lt;/code&gt;. I’m creating a new data frame that includes only the following tags:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)
+c.data &amp;lt;- filter(t.data, upos %in% c(&amp;quot;ADJ&amp;quot;, &amp;quot;ADV&amp;quot;, &amp;quot;NOUN&amp;quot;, &amp;quot;VERB&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Also, see the list of tags explained &lt;a href=&#34;https://spacy.io/api/annotation#pos-tagging&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The new data frame, c.data, probably only includes words that are adjective, adverb, noun, or verb now. Run the codes for the frequency table again, replacing the name of the data frame to see the changes.&lt;/p&gt;
+&lt;p&gt;To look at the percentages, use &lt;code&gt;prop.table&lt;/code&gt;. For example, see the percentage of each category under universal POS:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;prop.table(table(c.data$upos))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+##       ADJ       ADV      NOUN      VERB 
+## 0.1308117 0.1481481 0.3727344 0.3483058&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I will save two frequency tables as data frames, one for lemmas and one for universal POS tags.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;freq.lem &amp;lt;- data.frame(table(c.data$lemma))
+freq.upos &amp;lt;- data.frame(table(c.data$upos))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I will also order them by descending frequency using the arrange function in dplyr:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;freq.lem &amp;lt;- arrange(freq.lem, desc(Freq))
+freq.upos &amp;lt;- arrange(freq.upos, Var1)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;basic-visualization&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;2.2&lt;/span&gt; . Basic visualization&lt;/h2&gt;
+&lt;p&gt;I will make just one graph here, using the base graphics included in R. With the frequency data, it would make sense to visualize it as a bar plot.&lt;/p&gt;
+&lt;p&gt;Enter the following code. The first argument should be height, or the y-axis value (here, frequencies):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(freq.upos$Freq, names.arg = freq.upos$Var1, 
+        xlab = &amp;quot;Universal part-of-speech tags&amp;quot;, ylab = &amp;quot;Observed frequencies&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;I’ll make a graph of the top ten most frequent lemma with the package &lt;code&gt;ggplot2&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;top.lem &amp;lt;- subset(freq.lem[1:10,])
+names(top.lem)[1] &amp;lt;- &amp;quot;lemma&amp;quot; #change the variable (column 1) name to &amp;quot;lemma&amp;quot;
+top.lem$lemma &amp;lt;- levels(droplevels(top.lem$lemma)) #remove other lemmas that are listed as factors
+ggplot(top.lem, aes(x = lemma, y = Freq, label = Freq)) + 
+     geom_bar(stat = &amp;quot;identity&amp;quot;, fill = &amp;quot;black&amp;quot;, size = 6) + 
+     geom_text(color = &amp;quot;white&amp;quot;, size = 4, hjust = 1.5) + 
+     labs(x = &amp;quot;Lemma&amp;quot;, y = &amp;quot;Frequency&amp;quot;, title = &amp;quot;Top 10 most frequent lemmas&amp;quot;) + 
+     coord_flip() + theme_minimal()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;While the graph looks neat, one thing that bothers me is that spaCy lemmatizes all pronouns as “-PRON-”. This algorithm not only fails to distinguish between the first, second, and third person pronouns but also the hyphens can cause some issues with data handling. I’d run a code to re-lemmatize all pronouns if I wanted to include them in my analysis.&lt;/p&gt;
+&lt;p&gt;If you just need to tag texts for concordancing, it is much faster and appropriate to use existing software such as &lt;a href=&#34;http://www.laurenceanthony.net/software/tagant/&#34;&gt;TagAnt&lt;/a&gt; (Anthony, 2015). The tools I’ve used here are effective for data analysis.&lt;/p&gt;
+&lt;p&gt;I’ll continue to post, for my own documentation purpose, tools and techniques related to NLP and corpus analysis.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP</title>
+      <link>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/</link>
+      <pubDate>Tue, 09 Jan 2018 16:10:46 -0500</pubDate>
+      <guid>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#installing-python&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1&lt;/span&gt; . Installing Python&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#download-python&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.1&lt;/span&gt; . Download Python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#install-python&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.2&lt;/span&gt; . Install Python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#test-if-python-works&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.3&lt;/span&gt; . Test if Python works&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#installing-nlp-backend-spacy&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2&lt;/span&gt; . Installing NLP backend: spaCy&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#install-spacy&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2.1&lt;/span&gt; . Install spacy&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#download-language-models&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2.2&lt;/span&gt; . Download language models&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#getting-ready-with-rstudio&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3&lt;/span&gt; . Getting ready with RStudio&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#install-all-requirements&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.1&lt;/span&gt; . Install all requirements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#processing-a-text-string&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.2&lt;/span&gt; . Processing a text string&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This is Part 1 of a basic guide for setting up and using a natural language processing (NLP) tool with R. I specifically utilze the spaCy “industrial strength natural language processing” Python library, and an R wrapper called &lt;a href=&#34;https://statsmaths.github.io/cleanNLP/&#34;&gt;cleanNLP&lt;/a&gt; that provides tools for annotating texts and obtaining data tables. In this post, I will explain step-by-step how to get ready to work with text data using these two packages, and a snippet of what they can do.&lt;/p&gt;
+&lt;p&gt;I decided to write this post because for someone like me who has no background in computer science but wants to get their feet wet with NLP. It could be difficult to get started with these tools because you don’t know where to start or what to exactly look for. I have not yet seen any webpages that describe what I’m trying to do all in one place. It took a while for me to hunt down the information that I needed to carry out the kind of analyses that I wanted to do, and took many failed attempts to finally get the computer programs working. SpaCy and cleanNLP utilized in R have so far been the easiest to learn and work with in my experience as a beginner.&lt;/p&gt;
+&lt;p&gt;In this post, I assume you have some experience with R, but you should be able to follow along (though might not be able to understand what’s going on exactly) even if you haven’t used it before.&lt;/p&gt;
+&lt;p&gt;In case you need to install R and RStudio:&lt;br /&gt;
+&lt;a href=&#34;https://cran.r-project.org/bin/windows/base/&#34;&gt;Download R for Windows&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&#34;https://www.rstudio.com/products/rstudio/download/&#34;&gt;Download RStudio&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Before you begin, check your computer system environment and compare it with mine. My guidelines might not work in your setting and you might experience issues that I don’t mention here (use Google search!). My system environment is: Windows 10 64-bit operating system.&lt;/p&gt;
+&lt;div id=&#34;installing-python&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;1&lt;/span&gt; . Installing Python&lt;/h1&gt;
+&lt;p&gt;If you have never installed Python on your computer, great. You start with a clean slate and it might work the best. If you already have Python installed (must be Python 2.7 and up) but not sure if it works, skip to the end of this section (1.3) to test it.&lt;/p&gt;
+&lt;p&gt;Here, I’m installing the latest version of Python, 3.6.4, which works with my OS. If you don’t use Python for anything else, just following these instructions will probably be your best bet. There are different ways to install Python, for example, using &lt;a href=&#34;https://www.anaconda.com/download/&#34;&gt;Anaconda&lt;/a&gt; which provides GUI and may be better in the long run, but I won’t use it here.&lt;/p&gt;
+&lt;div id=&#34;download-python&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.1&lt;/span&gt; . Download Python&lt;/h2&gt;
+&lt;p&gt;First step, download Python from &lt;a href=&#34;https://www.python.org/downloads/windows/&#34;&gt;here&lt;/a&gt; link for Windows. Make sure to get an installer that matches your operating system and R. In other words, if you have 32-bit R installed, download the 32-bit version (labelled “Windows x86”). With 64-bit R, download 64-bit Python (labelled “Windows x86-64”).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;install-python&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.2&lt;/span&gt; . Install Python&lt;/h2&gt;
+&lt;p&gt;After the download is complete, execute the installer. Two important things. First, check the box that says “add to PATH” when you see it. For Python 2.7.x, this option has a different appearance - not as a checkbox but an icon to click somewhere during the setup. If you have accidentally neglected to check the “add to PATH” box, you will need to manually add the path for Python to the system environment variables (but it might be difficult to find what works for your system so you might as well just uninstall, reboot, and reinstall, enabling the above-mentioned option). Second, I recommend just use the default directory provided as the location. In my case, Python did not work properly when I installed it under a different location.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;test-if-python-works&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.3&lt;/span&gt; . Test if Python works&lt;/h2&gt;
+&lt;p&gt;Open up a Command Prompt by searching “command …” or “cmd” from the windows start menu. Preferably, open the program by right-clicking the mouse and selecting “run as administrator”. If you don’t run it as admin, it’s fine for now but you have to run it as admin when you execute Section 2.2 Download language models.&lt;/p&gt;
+&lt;p&gt;Type &lt;code&gt;python&lt;/code&gt; and hit enter.&lt;/p&gt;
+&lt;p&gt;Your installation was successful if you see something like this:&lt;br /&gt;
+&amp;gt; Python 3.6:d48eceb, Dec 19 2017, 06:54:40 64 bit (AMD64)] on win32
+&amp;gt; Type “help”, “copyright”, “credits” or “license” for more information.&lt;/p&gt;
+&lt;p&gt;If you get a message that says “python is not recognized as internal or external command”, which I don’t think you will, as long as you have followed the instructions exactly so far, it means trouble. If you don’t know well about these issues, the simplest solution is to uninstall, reboot, and reinstall. Hopefully you have not encountered any issues and have Python up and running now.&lt;/p&gt;
+&lt;p&gt;Now type in &lt;code&gt;exit()&lt;/code&gt; to move on to installing spaCy.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;installing-nlp-backend-spacy&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;2&lt;/span&gt; . Installing NLP backend: spaCy&lt;/h1&gt;
+&lt;p&gt;To put it very simply, spaCy is a library that processes and analyzes languages. CleanNLP utilizes this specific Python library. Another option with cleanNLP is coreNLP (Java). I find spaCy lighter and easier to set up than coreNLP (a point also noted by the creators). Here I only demonstrate installing spaCy. See the “Backends” section from &lt;a href=&#34;https://statsmaths.github.io/cleanNLP/&#34;&gt;here&lt;/a&gt; for more information related to this.&lt;/p&gt;
+&lt;div id=&#34;install-spacy&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;2.1&lt;/span&gt; . Install spacy&lt;/h2&gt;
+&lt;p&gt;In your Command Prompt, enter the following code:&lt;br /&gt;
+&lt;code&gt;pip install -U spacy&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;It can take several minutes to finish installing. If it fails to install with the error message that says Microsoft Visual C++ 14.0 is required, go download &lt;a href=&#34;https://visualstudio.microsoft.com/visual-cpp-build-tools/&#34;&gt;Visual C++ Build Tools&lt;/a&gt; and retry.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;download-language-models&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;2.2&lt;/span&gt; . Download language models&lt;/h2&gt;
+&lt;p&gt;Next step is to install the language models (as in Python packages) that you want. SpaCy provides packages for a number of languages: see &lt;a href=&#34;https://spacy.io/usage/models&#34;&gt;the models&lt;/a&gt; for languages other than English. In this example, I will install English models that I will use to process texts in English. One thing to note is that within English, different models are offered. Go to this page and scroll down to read about the models. The larger the model is, the more accurate it is, though the differences don’t seem to be that big.&lt;/p&gt;
+&lt;p&gt;Enter the following code to the command line:&lt;br /&gt;
+&lt;code&gt;python -m spacy download en_core_web_sm&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The default model is &lt;a href=&#34;https://spacy.io/models/en#en_core_web_sm&#34;&gt;en_core_web_sm&lt;/a&gt;. You can install multiple models if you wish. I installed the largest model:&lt;br /&gt;
+&lt;code&gt;python -m spacy download en_core_web_lg&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If you see an error message saying that linking was unsuccessful, it could be because you didn’t run the Command as administrator.&lt;/p&gt;
+&lt;p&gt;After downloading and linking is complete, test if the installed modules work by trying the following codes, one line at a time:&lt;br /&gt;
+&lt;code&gt;python&lt;/code&gt;
+&lt;code&gt;import spacy&lt;/code&gt;&lt;br /&gt;
+&lt;code&gt;nlp = spacy.load(&#39;en_core_web_sm&#39;)&lt;/code&gt;&lt;br /&gt;
+&lt;code&gt;doc = nlp(u&#39;This is a sentence.&#39;)&lt;/code&gt;&lt;br /&gt;
+&lt;code&gt;print(doc)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Did the last code return “This is a sentence.”? If yes, yay! - it’s probably safe to assume everything is running smoothly. Quit the Command Prompt and start RStudio. (Restart RStudio if you have had it open while installing spacy.)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;getting-ready-with-rstudio&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;3&lt;/span&gt; . Getting ready with RStudio&lt;/h1&gt;
+&lt;div id=&#34;install-all-requirements&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.1&lt;/span&gt; . Install all requirements&lt;/h2&gt;
+&lt;p&gt;This portion has been updated on December 21, 2018 to accommodate changes made to the cleanNLP package.&lt;/p&gt;
+&lt;p&gt;Create a new R script. The required packages for cleanNLP are:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#install packages: cleanNLP, reticulate
+install.packages(&amp;quot;cleanNLP&amp;quot;); install.packages(&amp;quot;reticulate&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#load the packages
+library(cleanNLP)
+library(reticulate)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To get started with processing texts, you need to initialize spacy:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#initalized the NLP backend
+cnlp_init_spacy(model_name = &amp;quot;en_core_web_sm&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, if this doesn’t work, try the following code to see whether there’s any problems with Python configuration on your computer.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#check your Python configuration
+py_config()
+## python:         C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\python.exe
+## libpython:      C:/Users/susie.DESKTOP-TF1TRHP/AppData/Local/Programs/Python/Python37/python37.dll
+## pythonhome:     C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37
+## version:        3.7.4 (tags/v3.7.4:e09359112e, Jul  8 2019, 20:34:20) [MSC v.1916 64 bit (AMD64)]
+## Architecture:   64bit
+## numpy:          C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\lib\site-packages\numpy
+## numpy_version:  1.17.2
+## 
+## python versions found: 
+##  C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\python.exe
+##  C:\Users\susie.DESKTOP-TF1TRHP\AppData\Local\Programs\Python\Python37\\python.exe&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A little anecdote is that when I first tested the automatic annotation, I used a line from “The Stairway to Heaven”: “There’s a lady who’s sure all that glitters is gold, and she’s buying a stairway to heaven.” The default model, the small and medium sized models marked “glitters” as a noun. The large model marked the word correctly as a verb. After seeing this, I’ve been using the large model.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;processing-a-text-string&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.2&lt;/span&gt; . Processing a text string&lt;/h2&gt;
+&lt;p&gt;This section will serve as a simple test and demonstration of the basic use of the cleanNLP package. It is based on the procedure described on the &lt;a href=&#34;https://statsmaths.github.io/cleanNLP/&#34;&gt;cleanNLP webpage&lt;/a&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#make up a text
+text &amp;lt;- &amp;quot;Let me be the one you call. If you jump, I&amp;#39;ll break your fall.&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we have a text to analyze. Give R a command to automatically annotate the text.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#run the annotator
+obj &amp;lt;- cnlp_annotate(text)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now you should have new data named &lt;code&gt;obj&lt;/code&gt;. It’s populated with lists of various data. Let’s view this data table with annotated objects.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#view the annotated data
+cnlp_get_token(obj)
+##      id sid tid  word  lemma  upos  pos cid
+## 2  doc1   1   1   Let    let  VERB   VB   0
+## 3  doc1   1   2    me -PRON-  PRON  PRP   4
+## 4  doc1   1   3    be     be  VERB   VB   7
+## 5  doc1   1   4   the    the   DET   DT  10
+## 6  doc1   1   5   one    one  NOUN   NN  14
+## 7  doc1   1   6   you -PRON-  PRON  PRP  18
+## 8  doc1   1   7  call   call  VERB  VBP  22
+## 9  doc1   1   8     .      . PUNCT    .  26
+## 11 doc1   2   1    If     if   ADP   IN  28
+## 12 doc1   2   2   you -PRON-  PRON  PRP  31
+## 13 doc1   2   3  jump   jump  VERB  VBP  35
+## 14 doc1   2   4     ,      , PUNCT    ,  39
+## 15 doc1   2   5     I -PRON-  PRON  PRP  41
+## 16 doc1   2   6 \\&amp;#39;ll   will   AUX   MD  42
+## 17 doc1   2   7 break  break  VERB   VB  46
+## 18 doc1   2   8  your -PRON-   DET PRP$  52
+## 19 doc1   2   9  fall   fall  NOUN   NN  57
+## 20 doc1   2  10     .      . PUNCT    .  61&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The table returns rows consisted of information regarding each token. Here are some detailed descriptions of what each column means:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;id&lt;/strong&gt;: Text id. Here ’id’s are all 1 because there is one text source.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;sid&lt;/strong&gt;: Sentence id (or sentence number) nested under ‘id’. We can see that we have 2 sentences in this text.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;tid&lt;/strong&gt;: Token id nested under ‘sid’. Note that for each sentence, ‘tid’ starts from 0 to mark ‘ROOT’, which indicates the start of a sentence. The default code hides the 0s, but they are there, and will be useful for corpus analysis.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;word&lt;/strong&gt;: The raw word as is in the source text.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;lemma&lt;/strong&gt;: The basic form of the token with no morphological changes.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;upos&lt;/strong&gt;: Universal part-of-speech, more general than ‘pos’.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;pos&lt;/strong&gt;: Language specific part-of-speech. For example, you can see tokens that are labelled as ‘VERB’ under the ‘upos’ column are further specified into verb infinitive (VB), verb present tense (VBP), and modal verbs (MD).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See &lt;code&gt;?cnlp_get_token&lt;/code&gt; for more information.&lt;/p&gt;
+&lt;p&gt;Here is another data table you might be interested in:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_get_dependency(obj)
+##      id sid tid tid_target relation relation_full
+## 1  doc1   1   0          1     ROOT            NA
+## 2  doc1   1   3          2    nsubj            NA
+## 3  doc1   1   1          3    ccomp            NA
+## 4  doc1   1   5          4      det            NA
+## 5  doc1   1   3          5     attr            NA
+## 6  doc1   1   7          6    nsubj            NA
+## 7  doc1   1   5          7    relcl            NA
+## 8  doc1   1   1          8    punct            NA
+## 9  doc1   2   3          1     mark            NA
+## 10 doc1   2   3          2    nsubj            NA
+## 11 doc1   2   7          3    advcl            NA
+## 12 doc1   2   7          4    punct            NA
+## 13 doc1   2   7          5    nsubj            NA
+## 14 doc1   2   7          6      aux            NA
+## 15 doc1   2   0          7     ROOT            NA
+## 16 doc1   2   9          8     poss            NA
+## 17 doc1   2   7          9     dobj            NA
+## 18 doc1   2   7         10    punct            NA&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This data frame contains annotations produced by grammatically parsing the text. In other words, they describe what roles the elements serve in each sentence. Though it is valuable information, I’m skeptical as to how accurate this parser is with learner language, so I won’t be dealing with this feature as much.&lt;/p&gt;
+&lt;p&gt;This concludes Part 1 of the series. In Part 2, I will go through how to process text files - single file, multiple files, and all files under a specific directory. Please contact me if you have any questions, corrections, or suggestions!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,1317 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tidytext | Susie Kim</title>
+    <link>https://susie-kim.github.io/tags/tidytext/</link>
+      <atom:link href="https://susie-kim.github.io/tags/tidytext/index.xml" rel="self" type="application/rss+xml" />
+    <description>tidytext</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Tue, 01 Jan 2019 20:00:00 -0500</lastBuildDate>
+    <image>
+      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <title>tidytext</title>
+      <link>https://susie-kim.github.io/tags/tidytext/</link>
+    </image>
+    
+    <item>
+      <title>Update to Using Stanford CoreNLP with R</title>
+      <link>https://susie-kim.github.io/post/2019-01-01-new-corenlp/</link>
+      <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
+      <guid>https://susie-kim.github.io/post/2019-01-01-new-corenlp/</guid>
+      <description>
+&lt;script src=&#34;https://susie-kim.github.io/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#preparation&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1&lt;/span&gt; . Preparation&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#install-java&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.1&lt;/span&gt; . Install Java&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#install-cleannlp-and-language-model&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;1.2&lt;/span&gt; . Install cleanNLP and language model&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#annotation-using-stanford-corenlp&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;2&lt;/span&gt; . Annotation Using Stanford CoreNLP&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#example-text-analysis-creating-bigrams-and-trigrams&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3&lt;/span&gt; . Example Text Analysis: Creating Bigrams and Trigrams&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#with-tidytext&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.1&lt;/span&gt; . With tidytext&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#manually-creating-bigrams-and-trigrams&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.2&lt;/span&gt; . Manually Creating Bigrams and Trigrams&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#example-analysis-be-words&#34;&gt;&lt;span class=&#34;toc-section-number&#34;&gt;3.3&lt;/span&gt; . Example Analysis: Be + words&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Forget my previous posts on &lt;a href=&#34;https://susie-kim.github.io/post/2018-04-06-guide-corenlp&#34;&gt;using the Stanford NLP engine via command&lt;/a&gt; and &lt;a href=&#34;https://susie-kim.github.io/post/2018-05-04-working-xml&#34;&gt;retreiving information from XML files&lt;/a&gt; in R…. I’ve found that everything can be done in RStudio (at least I learned more about how to work with XML in R). This post replaces these two previous ones and adds more example analyses.&lt;/p&gt;
+&lt;div id=&#34;preparation&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;1&lt;/span&gt; . Preparation&lt;/h1&gt;
+&lt;div id=&#34;install-java&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.1&lt;/span&gt; . Install Java&lt;/h2&gt;
+&lt;p&gt;Download and install, if you don’t already have in on your computer, the &lt;a href=&#34;https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html&#34;&gt;Java Development Kit&lt;/a&gt;. No specific things to look out for during installation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;install-cleannlp-and-language-model&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;1.2&lt;/span&gt; . Install cleanNLP and language model&lt;/h2&gt;
+&lt;p&gt;The packages we need in R are &lt;code&gt;rJava&lt;/code&gt; and &lt;code&gt;cleanNLP&lt;/code&gt;. Install the developmental version of &lt;code&gt;cleanNLP&lt;/code&gt; as using the (old) CRAN version won’t work properly.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;install.packages(&amp;quot;rJava&amp;quot;)
+devtools::install_github(&amp;quot;statsmaths/cleanNLP&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(cleanNLP)
+library(dplyr)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;After loading the package, you can pass an argument to download different language models. The default is set to English so I’m not going to pass anything to the function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_download_corenlp()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This will take some time.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;annotation-using-stanford-corenlp&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;2&lt;/span&gt; . Annotation Using Stanford CoreNLP&lt;/h1&gt;
+&lt;p&gt;Now you can itialize the engine to parse your text. The more annotation features you want to utlize, the higher the &lt;code&gt;anno_level&lt;/code&gt; will be. I usually just go for &lt;code&gt;anno_level = 0&lt;/code&gt; since I only need tokenization, lemmatization, and part-of-speech tagging. Loading higher level functions takes longer time and can slow down your computer.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_init_corenlp(anno_level = 0)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I’ll process the same five texts that I’ve been using in this blog, five random essays from the LOCNESS.
+The function below can directly call text files from a directory and annotate them.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anno_text &amp;lt;- cnlp_annotate(&amp;quot;corpus/*.txt&amp;quot;, as_strings = FALSE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, I like building the corpus as its own object to keep using it for various analyses.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Build the corpus
+txt_cor &amp;lt;- readtext::readtext(&amp;quot;corpus/*.txt&amp;quot;)
+
+#Save annotations as a table
+txt_ann &amp;lt;- cnlp_annotate(txt_cor)
+txt_tab &amp;lt;- cnlp_get_token(txt_ann)
+
+#Check the first 15 words
+head(txt_tab, 15)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 15 x 8
+##    id            sid   tid word     lemma    upos  pos     cid
+##    &amp;lt;chr&amp;gt;       &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;int&amp;gt;
+##  1 text_01.txt     1     1 Two      two      NUM   CD        0
+##  2 text_01.txt     1     2 men      man      NOUN  NNS       4
+##  3 text_01.txt     1     3 ,        ,        .     ,         7
+##  4 text_01.txt     1     4 one      one      NUM   CD        9
+##  5 text_01.txt     1     5 ring     ring     NOUN  NN       13
+##  6 text_01.txt     1     6 ,        ,        .     ,        17
+##  7 text_01.txt     1     7 only     only     ADV   RB       19
+##  8 text_01.txt     1     8 one      one      NUM   CD       24
+##  9 text_01.txt     1     9 can      can      VERB  MD       28
+## 10 text_01.txt     1    10 leave    leave    VERB  VB       32
+## 11 text_01.txt     1    11 .        .        .     .        37
+## 12 text_01.txt     2     1 Dramatic dramatic ADJ   JJ       39
+## 13 text_01.txt     2     2 it       it       PRON  PRP      48
+## 14 text_01.txt     2     3 may      may      VERB  MD       51
+## 15 text_01.txt     2     4 be       be       VERB  VB       55&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It appears that everything worked well. Next, I’ll do some text analysis.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;example-text-analysis-creating-bigrams-and-trigrams&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;3&lt;/span&gt; . Example Text Analysis: Creating Bigrams and Trigrams&lt;/h1&gt;
+&lt;div id=&#34;with-tidytext&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.1&lt;/span&gt; . With tidytext&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;tidytext&lt;/code&gt; is a convenient means to perform text analysis. package. Luckily, free resources are available such as &lt;a href=&#34;https://www.tidytextmining.com/&#34;&gt;Tidytext&lt;/a&gt; that will serve as a structured, useful guide.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidytext)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This package includes some functions that are easy to use. We used the corenlp to POS tag the text but if we didn’t need that, we could have just tokenized using the &lt;code&gt;unnest_tokens()&lt;/code&gt; function as I have done in the previous post.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;unnest_token()&lt;/code&gt; first takes the data frame (&lt;code&gt;txt_cor&lt;/code&gt;). The default setting breaks the text into words (i.e., tokenizes) and creates a new data frame. We need to provide the name of the column for this new data frame (output, I named it &lt;code&gt;word&lt;/code&gt;) and the column that includes the text data (input, which is &lt;code&gt;text&lt;/code&gt;).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tidy_tok &amp;lt;- txt_cor %&amp;gt;% unnest_tokens(word, text)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Analyzing n-grams is done with the same function. We can just provide different values to generate a table of n-grams. The first following code takes the corpus and creates a new data frame (&lt;code&gt;tidy_bi&lt;/code&gt;) with the column &lt;code&gt;bigram&lt;/code&gt; that contains the bigram. &lt;code&gt;token = &#34;ngrams&#34;&lt;/code&gt; and &lt;code&gt;n =2&lt;/code&gt; will extract two-word sequences. The second code will create a list of trigrams.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tidy_bi &amp;lt;- txt_cor %&amp;gt;% unnest_tokens(bigram, text, token = &amp;quot;ngrams&amp;quot;, n = 2)
+tidy_tri &amp;lt;- txt_cor %&amp;gt;% unnest_tokens(trigram, text, token = &amp;quot;ngrams&amp;quot;, n = 3)&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-condensed table-responsive&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+bigram
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+trigram
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+two men
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+two men one
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+men one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+men one ring
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+one ring
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+one ring only
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ring only
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ring only one
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+only one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+only one can
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+one can
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+one can leave
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+can leave
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+can leave dramatic
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+leave dramatic
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+leave dramatic it
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+dramatic it
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+dramatic it may
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+it may
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+it may be
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Coming from a linguistics perspective, I find it potentially problematic that the bigrams include word chunks that are not meaningful, especially for qualitative text analysis. What I mean is that, for example, the last word of sentence #1 and the first word of sentence #2, “it dramatically”, are treated as a bigram. Same applies to words within a sentence that are separated by commas or other punctuation. Consider the first couple sentences from our corpus:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;“Two men, one ring, only one can leave. Dramatic it may be but…”&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;“men one” is not meaningful, “ring only” is not meaningful. Punctuation serves specific purposes in writing, and ignoring them might fail to deliver meaningful results. Crossing such borders can also lead to misleading results. The meaningful, uninterrupted n-grams are called “CollGrams” by some researchers (Bestgen &amp;amp; Granger, 2014)&lt;a href=&#34;#fn1&#34; class=&#34;footnote-ref&#34; id=&#34;fnref1&#34;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;manually-creating-bigrams-and-trigrams&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.2&lt;/span&gt; . Manually Creating Bigrams and Trigrams&lt;/h2&gt;
+&lt;p&gt;For this reason, I’ll go back to the annotated data we created earlier. To inspect sequences of words, we can use the &lt;code&gt;lead()&lt;/code&gt; function from the &lt;code&gt;dplyr&lt;/code&gt; package, to create new columns that contain information regarding the next row of each word.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_df &amp;lt;- txt_tab %&amp;gt;% 
+  mutate(second_word = lead(word), second_upos = lead(upos), second_pos = lead(pos), 
+         third_word = lead(word, 2), third_upos = lead(upos, 2), third_pos = lead(pos, 2))&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-condensed table-responsive&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+sid
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+tid
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+lemma
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+upos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+pos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+second_word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+second_upos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+second_pos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+third_word
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+third_upos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+third_pos
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+Two
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+two
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+men
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+NOUN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+NNS
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+men
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+man
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+NOUN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+NNS
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+3
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+ring
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+NOUN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+NN
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+4
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+ring
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+NOUN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+NN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+5
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+ring
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+ring
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+NOUN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+NN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+only
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+ADV
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+RB
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+,
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+only
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+ADV
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+RB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+7
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+only
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+only
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+ADV
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+RB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+can
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+8
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+can
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+leave
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+9
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+can
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+can
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+leave
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+10
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+leave
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+leave
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #f9f2f4 !important;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e6f3e6 !important;&#34;&gt;
+.
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+Dramatic
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+ADJ
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;background-color: #e7e7f4 !important;&#34;&gt;
+JJ
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;In the newly created columns in light green are information pertaining to the next word, and the columns in light blue are that of the second next word.&lt;/p&gt;
+&lt;p&gt;To clean this data, we’ll execute the following code. The &lt;code&gt;unite()&lt;/code&gt; function from the &lt;code&gt;tidyr&lt;/code&gt; package concatenates the &lt;code&gt;word&lt;/code&gt; and &lt;code&gt;second_word&lt;/code&gt; to show the biagram. Although where punctuation occurs can be of interest itself (e.g., marking clauses, inserting phrases, etc.), in this post I’ll filter out the bigrams that include any punctuation marks to only consider two- or three-word sequences that co-occur without any interruption.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyr)
+
+txt_bi &amp;lt;- txt_df %&amp;gt;% unite(bigram, word, second_word, sep = &amp;quot; &amp;quot;) %&amp;gt;% 
+  filter(!second_upos == &amp;quot;.&amp;quot;, !upos == &amp;quot;.&amp;quot;) %&amp;gt;% select(1, 4:9)&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-condensed table-responsive&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+bigram
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+lemma
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+upos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+pos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+second_upos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+second_pos
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #f9f2f4 !important;&#34;&gt;
+Two men
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+two
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NOUN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NNS
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #f9f2f4 !important;&#34;&gt;
+one ring
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NOUN
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NN
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #f9f2f4 !important;&#34;&gt;
+only one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+only
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ADV
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+RB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #f9f2f4 !important;&#34;&gt;
+one can
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #f9f2f4 !important;&#34;&gt;
+can leave
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+can
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #f9f2f4 !important;&#34;&gt;
+Dramatic it
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+dramatic
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ADJ
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+JJ
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+PRON
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+PRP
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #f9f2f4 !important;&#34;&gt;
+it may
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+it
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+PRON
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+PRP
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #f9f2f4 !important;&#34;&gt;
+may be
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+may
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_tri &amp;lt;- txt_df %&amp;gt;% unite(trigram, word, second_word, third_word, sep = &amp;quot; &amp;quot;) %&amp;gt;% 
+  filter(!third_upos == &amp;quot;.&amp;quot;, !second_upos == &amp;quot;.&amp;quot;, !upos == &amp;quot;.&amp;quot;) %&amp;gt;% select(1, 4:11)&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-condensed table-responsive&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+id
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+trigram
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+lemma
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+upos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+pos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+second_upos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+second_pos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+third_upos
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+third_pos
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #e6f3e6 !important;&#34;&gt;
+only one can
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+only
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ADV
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+RB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #e6f3e6 !important;&#34;&gt;
+one can leave
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+one
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+NUM
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #e6f3e6 !important;&#34;&gt;
+Dramatic it may
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+dramatic
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ADJ
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+JJ
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+PRON
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+PRP
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #e6f3e6 !important;&#34;&gt;
+it may be
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+it
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+PRON
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+PRP
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #e6f3e6 !important;&#34;&gt;
+may be but
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+may
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+MD
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CONJ
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CC
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #e6f3e6 !important;&#34;&gt;
+be but basically
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+be
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CONJ
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CC
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ADV
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+RB
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #e6f3e6 !important;&#34;&gt;
+but basically that
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+but
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CONJ
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+CC
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ADV
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+RB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+DET
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+DT
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+text_01.txt
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;font-weight: bold;background-color: #e6f3e6 !important;&#34;&gt;
+basically that is
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+basically
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+ADV
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+RB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+DET
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+DT
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VERB
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+VBZ
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div id=&#34;example-analysis-be-words&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.3&lt;/span&gt; . Example Analysis: Be + words&lt;/h2&gt;
+&lt;p&gt;What’s the most common part of speech that comes after the “be” verb? What does it say about the role of the “be” verb and the constituent that follows?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_bi %&amp;gt;% filter(lemma == &amp;quot;be&amp;quot;) %&amp;gt;% count(second_upos, sort = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Largely, “be” is most frequently followed by another verb. Looking at the POS tag reveals a bit more information.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_bi %&amp;gt;% filter(lemma == &amp;quot;be&amp;quot;) %&amp;gt;% count(second_pos, sort = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The “be” verb most frequently co-occurs with another verb in the past participle form (i.e., VBN), so presumably the 34 occurrences are passive constructions, in which “be” serves as an auxiliary.&lt;/p&gt;
+&lt;p&gt;It’s almost certain that a determiner starts a noun phrase, thus in 27 cases the “be” verb is a main verb and is followed by a noun phrase complement.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://susie-kim.github.io/post/2019-01-01-new-corenlp_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;864&#34; style=&#34;display: block; margin: auto auto auto 0;&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_bi %&amp;gt;% filter(lemma == &amp;quot;be&amp;quot;, second_pos == &amp;quot;VBN&amp;quot;) %&amp;gt;% select(bigram)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 34 x 1
+##    bigram        
+##    &amp;lt;chr&amp;gt;         
+##  1 been made     
+##  2 be banned     
+##  3 is argued     
+##  4 been won      
+##  5 be banned     
+##  6 was put       
+##  7 be prepared   
+##  8 are surrounded
+##  9 are trained   
+## 10 are paid      
+## # ... with 24 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The third most frequently co-occuring tag is the adverb. The question is then, what follows an adverb? Considering that verb past participle is the category that appears most frequently after “be”, it could be that an adverb is inserted between these two verbs (&lt;em&gt;be&lt;/em&gt; + adverb + past participle; e.g., &lt;em&gt;is actually made&lt;/em&gt;).&lt;/p&gt;
+&lt;p&gt;It is also possible that the adverb is part of an adjective phrase (e.g., &lt;em&gt;is really important&lt;/em&gt;), which in turn, may or may not constitute a noun phrase (e.g., &lt;em&gt;is really an important &lt;/em&gt;). Let’s dig a little deeper by looking at the trigrams.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_tri %&amp;gt;% 
+    filter(lemma == &amp;quot;be&amp;quot;, second_pos == &amp;quot;RB&amp;quot;) %&amp;gt;% 
+    count(third_pos, sort = TRUE) %&amp;gt;% 
+    mutate(percent = round(n*100/sum(n), 1))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 10 x 3
+##    third_pos     n percent
+##    &amp;lt;chr&amp;gt;     &amp;lt;int&amp;gt;   &amp;lt;dbl&amp;gt;
+##  1 JJ            9    34.6
+##  2 DT            4    15.4
+##  3 RB            4    15.4
+##  4 VBG           2     7.7
+##  5 VBN           2     7.7
+##  6 CD            1     3.8
+##  7 IN            1     3.8
+##  8 RBR           1     3.8
+##  9 TO            1     3.8
+## 10 WRB           1     3.8&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It appears that many of the “be + adverb” sequences (34.6%) are followed by an adjective, such as:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;txt_tri %&amp;gt;% 
+  filter(lemma == &amp;quot;be&amp;quot;, second_pos == &amp;quot;RB&amp;quot;, third_pos == &amp;quot;JJ&amp;quot;) %&amp;gt;% 
+  select(trigram)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 9 x 1
+##   trigram             
+##   &amp;lt;chr&amp;gt;               
+## 1 are already few     
+## 2 were not stupid     
+## 3 is not right        
+## 4 is very popular     
+## 5 is always much      
+## 6 is clearly aware    
+## 7 is hardly surprising
+## 8 is very likely      
+## 9 be very severe&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, to determine the exact structure, we need to go further. We can look at the sentence where each trigram occurs.&lt;/p&gt;
+&lt;table class=&#34;table table-condensed table-responsive&#34; style=&#34;margin-left: auto; margin-right: auto;&#34;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+trigram
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+sentence
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+are already few
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+first of all, there are already few enough liberties in this country when compared with other nations of similar political and economic conditions such as france and the united states.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+were not stupid
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+these men were professionals, they were not stupid.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+is not right
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+the people who want the sport to be banned, say this because it is not right for people to fight, and there is a too high risk of serious injury and brain damage caused by the severe pounding that the head takes during a boxing match.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+is very popular
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+another reason not to ban boxing is because it is very popular, and millions of people worldwide get entertained by watching boxing, so why should it banned it will cause displeasure to so many people.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+is always much
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+there is always much speculation over the dangers of such a brutal sport as boxing.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+is clearly aware
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+he is clearly aware of the dangers and brutalism of the sport, which is possibly why he enjoys it so much.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+is hardly surprising
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+it is hardly surprising how important the sport can be to some.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+is very likely
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+so, a boxer who has been boxing for a number of years, ten for example, and retires is very likely to have brain damage and it could be very severe or hardly noticable but the damage is still there.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;width: 15em; font-weight: bold;&#34;&gt;
+be very severe
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+so, a boxer who has been boxing for a number of years, ten for example, and retires is very likely to have brain damage and it could be very severe or hardly noticable but the damage is still there.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;As a very rough summary, we can say that out of 127 cases where the verb “be” was used, 40 were auxiliary be, consisting passive voice constructions and progressive forms. In other times, the verb was frequently followed by a noun phrase (at least 31 times) or an adjective phrase that may or may not be embedded in a noun phrase.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;footnotes&#34;&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn1&#34;&gt;&lt;p&gt;Bestgen, Y., &amp;amp; Granger, S. (2014). Quantifying the development of phraseological competence in L2 English writing: An automated approach. &lt;em&gt;Journal of Second Language Writing&lt;/em&gt;, &lt;em&gt;26&lt;/em&gt;, 28-41. &lt;a href=&#34;https://doi.org/10.1016/j.jslw.2014.09.004&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1016/j.jslw.2014.09.004&lt;/a&gt;.&lt;a href=&#34;#fnref1&#34; class=&#34;footnote-back&#34;&gt;↩&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
