@@ -12,5 +12,5 @@ nav_font = "Poppins"
 mono_font = "Fira Mono"
 
 # Font size
-font_size = "16"
-font_size_small = "16"
+font_size = "12"
+font_size_small = "10"

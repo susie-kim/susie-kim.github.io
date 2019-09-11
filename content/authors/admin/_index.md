@@ -18,7 +18,7 @@ organizations:
   url: "https://eas.princeton.edu"
 
 # Short bio (displayed in user profile at end of posts)
-bio: My research interests include distributed robotics, mobile computing and programmable matter.
+bio: My research interests include language assessment, proficiency standards, corpus linguistics, and second language writing.
 
 interests:
 - Language Assessment
