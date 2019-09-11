@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>linguistic features | Susie Kim</title>
+    <link>/tags/linguistic-features/</link>
+      <atom:link href="/tags/linguistic-features/index.xml" rel="self" type="application/rss+xml" />
+    <description>linguistic features</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Thu, 27 Dec 2018 00:00:00 -0500</lastBuildDate>
+    <image>
+      <url>/img/icon-192.png</url>
+      <title>linguistic features</title>
+      <link>/tags/linguistic-features/</link>
+    </image>
+    
+    <item>
+      <title>Language assessment and linguistic features</title>
+      <link>/project/research-topic-1/</link>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 -0500</pubDate>
+      <guid>/project/research-topic-1/</guid>
+      <description>&lt;p&gt;These are the studies on this topic that I have presented at various conferences:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Kim, S. (2019, March). Assessing grammatical features in second language writing: A corpus-based analysis for rating scale validation. Paper to be presented at the American Association for Applied Linguistics (AAAL) conference, Atlanta, Georgia, USA.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S. (2018, September). Predicting CEFR proficiency level using grammatical criterial features. Paper presented at the American Association for Corpus Linguistics (AACL) conference, Atlanta, Georgia, USA.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S., Reed, D. J., Ohlrogge, A., Kim, H., Van Gorp, K., Isbell, D. R. (2018, March). Investigating the textual complexity of essay benchmarks at different levels on a scale within the CEFR B2 range. Work-in-progress presented at the Language Assessment Research Conference (LARC), Ames, Iowa, USA.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S. (2017, March). Examining the grammatical criterial features for CEFR levels in a learner corpus of written English. Paper presented at the American Association for Applied Linguistics (AAAL) conference, Portland, Oregon, USA.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

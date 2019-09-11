@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects | Susie Kim</title>
+    <link>/project/</link>
+      <atom:link href="/project/index.xml" rel="self" type="application/rss+xml" />
+    <description>Projects</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Thu, 27 Dec 2018 00:00:00 -0500</lastBuildDate>
+    <image>
+      <url>/img/icon-192.png</url>
+      <title>Projects</title>
+      <link>/project/</link>
+    </image>
+    
+    <item>
+      <title>Language assessment and linguistic features</title>
+      <link>/project/research-topic-1/</link>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 -0500</pubDate>
+      <guid>/project/research-topic-1/</guid>
+      <description>&lt;p&gt;These are the studies on this topic that I have presented at various conferences:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Kim, S. (2019, March). Assessing grammatical features in second language writing: A corpus-based analysis for rating scale validation. Paper to be presented at the American Association for Applied Linguistics (AAAL) conference, Atlanta, Georgia, USA.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S. (2018, September). Predicting CEFR proficiency level using grammatical criterial features. Paper presented at the American Association for Corpus Linguistics (AACL) conference, Atlanta, Georgia, USA.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S., Reed, D. J., Ohlrogge, A., Kim, H., Van Gorp, K., Isbell, D. R. (2018, March). Investigating the textual complexity of essay benchmarks at different levels on a scale within the CEFR B2 range. Work-in-progress presented at the Language Assessment Research Conference (LARC), Ames, Iowa, USA.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S. (2017, March). Examining the grammatical criterial features for CEFR levels in a learner corpus of written English. Paper presented at the American Association for Applied Linguistics (AAAL) conference, Portland, Oregon, USA.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Studies on Korean learning and teaching</title>
+      <link>/project/research-topic-2/</link>
+      <pubDate>Thu, 27 Dec 2018 00:00:00 -0500</pubDate>
+      <guid>/project/research-topic-2/</guid>
+      <description>&lt;p&gt;These are the studies on this topic that I have published and presented at various conferences:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Kim, S. (2017). A survey on postsecondary Korean language programs in the United States. &lt;em&gt;Journal of the National Council of Less Commonly Taught Languages&lt;/em&gt;, &lt;em&gt;21&lt;/em&gt;, 99-126. &lt;a href=&#34;https://www.researchgate.net/publication/321887612_A_Survey_on_Postsecondary_Korean_Language_Programs_in_the_United_States&#34; target=&#34;_blank&#34;&gt;link&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S., &amp;amp; Yoon, H.-J. (2016). Stop using that: Expressing definiteness in Korean. &lt;em&gt;MSU Working Papers in Second Language Studies&lt;/em&gt;, &lt;em&gt;7&lt;/em&gt;, 44-56. &lt;a href=&#34;http://sls.msu.edu/soslap/journal/index.php/sls/article/download/80/63&#34; target=&#34;_blank&#34;&gt;link&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S. (2018, March). Capital, Ideology, and Value Creation: A case study of an American learner of Korean. Paper presented at the American Association for Applied Linguistics (AAAL) conference, Chicago, Illinois, USA.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Kim, S., &amp;amp; Park, O.-S. (2016, October). Validation of a Korean Speaking Proficiency Assessment. Poster presented at the Midwest Association of Language Testers (MwALT) conference, West Lafayette, Indiana, USA.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
