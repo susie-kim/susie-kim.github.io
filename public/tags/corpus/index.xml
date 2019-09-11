@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>corpus | Susie Kim</title>
-    <link>https://susie-kim.github.io/tags/corpus/</link>
-      <atom:link href="https://susie-kim.github.io/tags/corpus/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/corpus/</link>
+      <atom:link href="/tags/corpus/index.xml" rel="self" type="application/rss+xml" />
     <description>corpus</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Tue, 25 Dec 2018 20:00:00 -0500</lastBuildDate>
     <image>
-      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <url>/img/icon-192.png</url>
       <title>corpus</title>
-      <link>https://susie-kim.github.io/tags/corpus/</link>
+      <link>/tags/corpus/</link>
     </image>
     
     <item>
       <title>Comparing tools for obtaining word token and type</title>
-      <link>https://susie-kim.github.io/post/2018-12-25-token-type/</link>
+      <link>/post/2018-12-25-token-type/</link>
       <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2018-12-25-token-type/</guid>
+      <guid>/post/2018-12-25-token-type/</guid>
       <description>
-&lt;script src=&#34;https://susie-kim.github.io/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
@@ -308,7 +308,7 @@ text_05.txt
 &lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;3&lt;/span&gt; . Results from Natural Language Processing Tools&lt;/h1&gt;
 &lt;div id=&#34;spacy&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.1&lt;/span&gt; . spacy&lt;/h2&gt;
-&lt;p&gt;For installation, see &lt;a href=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/&#34;&gt;my previous post on the topic&lt;/a&gt;.
+&lt;p&gt;For installation, see &lt;a href=&#34;/post/2018-01-09-guide-cnlp-part1/&#34;&gt;my previous post on the topic&lt;/a&gt;.
 I annotate the corpus using the &lt;code&gt;cnlp_annotate&lt;/code&gt; function, which will perform tokenization, lemmatization, and tagging for parts-of-speech.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(cleanNLP); library(reticulate)
 
@@ -428,7 +428,7 @@ text_05.txt
 &lt;/div&gt;
 &lt;div id=&#34;stanford-corenlp&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.2&lt;/span&gt; . Stanford CoreNLP&lt;/h2&gt;
-&lt;p&gt;To exercise this option, I utilzed the Stanford CoreNLP tool, the process of which is illustrated in &lt;a href=&#34;https://susie-kim.github.io/post/2018-04-06-guide-corenlp/&#34;&gt;this post&lt;/a&gt;. I have already processed the tfiles and only present the results here. The types of output I have genereated are the same as with the previous one.&lt;/p&gt;
+&lt;p&gt;To exercise this option, I utilzed the Stanford CoreNLP tool, the process of which is illustrated in &lt;a href=&#34;/post/2018-04-06-guide-corenlp/&#34;&gt;this post&lt;/a&gt;. I have already processed the tfiles and only present the results here. The types of output I have genereated are the same as with the previous one.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(st_tok, 10)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##             id  word lemma CharacterOffsetBegin CharacterOffsetEnd POS
 ## 1  text_01.txt   Two   two                    0                  3  CD
@@ -1114,9 +1114,9 @@ text_05.txt
     
     <item>
       <title>Working with XML-formatted text annotations in R</title>
-      <link>https://susie-kim.github.io/post/2018-05-04-working-xml/</link>
+      <link>/post/2018-05-04-working-xml/</link>
       <pubDate>Fri, 04 May 2018 10:34:40 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2018-05-04-working-xml/</guid>
+      <guid>/post/2018-05-04-working-xml/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
@@ -1228,9 +1228,9 @@ clean_matches &amp;lt;- gsub(&amp;quot; (?=[.,!?])&amp;quot;, &amp;quot;&amp;quo
     
     <item>
       <title>A guide to using the Stanford CoreNLP Tools for automatic text annotation</title>
-      <link>https://susie-kim.github.io/post/2018-04-06-guide-corenlp/</link>
+      <link>/post/2018-04-06-guide-corenlp/</link>
       <pubDate>Fri, 06 Apr 2018 12:20:40 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2018-04-06-guide-corenlp/</guid>
+      <guid>/post/2018-04-06-guide-corenlp/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
@@ -1278,9 +1278,9 @@ You need to minimally include &lt;code&gt;tokenize&lt;/code&gt; and &lt;code&gt;
     
     <item>
       <title>A basic guide to using NLP for corpus analysis with R (Part 2): Processing text files</title>
-      <link>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2/</link>
+      <link>/post/2018-01-09-guide-cnlp-part2/</link>
       <pubDate>Tue, 09 Jan 2018 16:20:46 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2/</guid>
+      <guid>/post/2018-01-09-guide-cnlp-part2/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
@@ -1373,7 +1373,7 @@ freq.upos &amp;lt;- arrange(freq.upos, Var1)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Enter the following code. The first argument should be height, or the y-axis value (here, frequencies):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(freq.upos$Freq, names.arg = freq.upos$Var1, 
         xlab = &amp;quot;Universal part-of-speech tags&amp;quot;, ylab = &amp;quot;Observed frequencies&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;I’ll make a graph of the top ten most frequent lemma with the package &lt;code&gt;ggplot2&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;top.lem &amp;lt;- subset(freq.lem[1:10,])
 names(top.lem)[1] &amp;lt;- &amp;quot;lemma&amp;quot; #change the variable (column 1) name to &amp;quot;lemma&amp;quot;
@@ -1383,7 +1383,7 @@ ggplot(top.lem, aes(x = lemma, y = Freq, label = Freq)) +
      geom_text(color = &amp;quot;white&amp;quot;, size = 4, hjust = 1.5) + 
      labs(x = &amp;quot;Lemma&amp;quot;, y = &amp;quot;Frequency&amp;quot;, title = &amp;quot;Top 10 most frequent lemmas&amp;quot;) + 
      coord_flip() + theme_minimal()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;While the graph looks neat, one thing that bothers me is that spaCy lemmatizes all pronouns as “-PRON-”. This algorithm not only fails to distinguish between the first, second, and third person pronouns but also the hyphens can cause some issues with data handling. I’d run a code to re-lemmatize all pronouns if I wanted to include them in my analysis.&lt;/p&gt;
 &lt;p&gt;If you just need to tag texts for concordancing, it is much faster and appropriate to use existing software such as &lt;a href=&#34;http://www.laurenceanthony.net/software/tagant/&#34;&gt;TagAnt&lt;/a&gt; (Anthony, 2015). The tools I’ve used here are effective for data analysis.&lt;/p&gt;
 &lt;p&gt;I’ll continue to post, for my own documentation purpose, tools and techniques related to NLP and corpus analysis.&lt;/p&gt;
@@ -1394,9 +1394,9 @@ ggplot(top.lem, aes(x = lemma, y = Freq, label = Freq)) +
     
     <item>
       <title>A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP</title>
-      <link>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/</link>
+      <link>/post/2018-01-09-guide-cnlp-part1/</link>
       <pubDate>Tue, 09 Jan 2018 16:10:46 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/</guid>
+      <guid>/post/2018-01-09-guide-cnlp-part1/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;

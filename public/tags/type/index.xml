@@ -2,23 +2,23 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>type | Susie Kim</title>
-    <link>https://susie-kim.github.io/tags/type/</link>
-      <atom:link href="https://susie-kim.github.io/tags/type/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/type/</link>
+      <atom:link href="/tags/type/index.xml" rel="self" type="application/rss+xml" />
     <description>type</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Tue, 25 Dec 2018 20:00:00 -0500</lastBuildDate>
     <image>
-      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <url>/img/icon-192.png</url>
       <title>type</title>
-      <link>https://susie-kim.github.io/tags/type/</link>
+      <link>/tags/type/</link>
     </image>
     
     <item>
       <title>Comparing tools for obtaining word token and type</title>
-      <link>https://susie-kim.github.io/post/2018-12-25-token-type/</link>
+      <link>/post/2018-12-25-token-type/</link>
       <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2018-12-25-token-type/</guid>
+      <guid>/post/2018-12-25-token-type/</guid>
       <description>
-&lt;script src=&#34;https://susie-kim.github.io/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/rmarkdown-libs/kePrint/kePrint.js&#34;&gt;&lt;/script&gt;
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
@@ -308,7 +308,7 @@ text_05.txt
 &lt;h1&gt;&lt;span class=&#34;header-section-number&#34;&gt;3&lt;/span&gt; . Results from Natural Language Processing Tools&lt;/h1&gt;
 &lt;div id=&#34;spacy&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.1&lt;/span&gt; . spacy&lt;/h2&gt;
-&lt;p&gt;For installation, see &lt;a href=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/&#34;&gt;my previous post on the topic&lt;/a&gt;.
+&lt;p&gt;For installation, see &lt;a href=&#34;/post/2018-01-09-guide-cnlp-part1/&#34;&gt;my previous post on the topic&lt;/a&gt;.
 I annotate the corpus using the &lt;code&gt;cnlp_annotate&lt;/code&gt; function, which will perform tokenization, lemmatization, and tagging for parts-of-speech.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(cleanNLP); library(reticulate)
 
@@ -428,7 +428,7 @@ text_05.txt
 &lt;/div&gt;
 &lt;div id=&#34;stanford-corenlp&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;span class=&#34;header-section-number&#34;&gt;3.2&lt;/span&gt; . Stanford CoreNLP&lt;/h2&gt;
-&lt;p&gt;To exercise this option, I utilzed the Stanford CoreNLP tool, the process of which is illustrated in &lt;a href=&#34;https://susie-kim.github.io/post/2018-04-06-guide-corenlp/&#34;&gt;this post&lt;/a&gt;. I have already processed the tfiles and only present the results here. The types of output I have genereated are the same as with the previous one.&lt;/p&gt;
+&lt;p&gt;To exercise this option, I utilzed the Stanford CoreNLP tool, the process of which is illustrated in &lt;a href=&#34;/post/2018-04-06-guide-corenlp/&#34;&gt;this post&lt;/a&gt;. I have already processed the tfiles and only present the results here. The types of output I have genereated are the same as with the previous one.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(st_tok, 10)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##             id  word lemma CharacterOffsetBegin CharacterOffsetEnd POS
 ## 1  text_01.txt   Two   two                    0                  3  CD
