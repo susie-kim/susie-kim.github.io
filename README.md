@@ -1,1 +1,1 @@
-This repository serves as my website :)
+This repository serves as my personal website :)
