@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Authors | Susie Kim</title>
-    <link>/authors/</link>
-      <atom:link href="/authors/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://susie-kim.github.io/authors/</link>
+      <atom:link href="https://susie-kim.github.io/authors/index.xml" rel="self" type="application/rss+xml" />
     <description>Authors</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright>
     <image>
-      <url>/img/icon-192.png</url>
+      <url>https://susie-kim.github.io/img/icon-192.png</url>
       <title>Authors</title>
-      <link>/authors/</link>
+      <link>https://susie-kim.github.io/authors/</link>
     </image>
     
     <item>
       <title></title>
-      <link>/authors/admin/</link>
+      <link>https://susie-kim.github.io/authors/admin/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>/authors/admin/</guid>
+      <guid>https://susie-kim.github.io/authors/admin/</guid>
       <description>&lt;p&gt;I am an applied linguist and language teacher, currently working as a Lecturer in Korean Language for the &lt;a href=&#34;https://eas.princeton.edu&#34; target=&#34;_blank&#34;&gt;Department of East Asian Studies&lt;/a&gt; at Princeton University.&lt;/p&gt;
 
 &lt;p&gt;My main research interest sits at the intersection of language assessment, second language writing, language proficiency standards (e.g., CEFR, ACTFL), and corpus-based methods. Thus far, I have primarily focused on linguistic characteristics and textual features of second language (L2) English at various proficiency levels. I plan to direct these interests toward desgining standards-based practices for foreign language programs and building/analyzing Korean language corpora for teaching purposes.&lt;/p&gt;
