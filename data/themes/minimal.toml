@@ -7,12 +7,16 @@ light = true
 # Primary
 primary = "#333333"
 
+# Links
+link = "#df5000"
+link_hover = "rgb(54, 54, 54)"
+
 # Menu
 menu_primary = "#333333"
-menu_text = "#fff"
-menu_text_active = "#f0f0f0"
-menu_title = "#fff"
+menu_text = "#c2b4af"
+menu_text_active = "#eeece9"
+menu_title = "#eeece9"
 
 # Home sections
-home_section_odd = "rgb(255, 255, 255)"
+home_section_odd = "rgb(238, 236, 233)"
 home_section_even = "rgb(247, 247, 247)"

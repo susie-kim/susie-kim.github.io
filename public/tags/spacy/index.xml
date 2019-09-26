@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>spacy | Susie Kim</title>
-    <link>https://susie-kim.github.io/tags/spacy/</link>
-      <atom:link href="https://susie-kim.github.io/tags/spacy/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/spacy/</link>
+      <atom:link href="/tags/spacy/index.xml" rel="self" type="application/rss+xml" />
     <description>spacy</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Tue, 09 Jan 2018 16:20:46 -0500</lastBuildDate>
     <image>
-      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <url>/img/icon-192.png</url>
       <title>spacy</title>
-      <link>https://susie-kim.github.io/tags/spacy/</link>
+      <link>/tags/spacy/</link>
     </image>
     
     <item>
       <title>A basic guide to using NLP for corpus analysis with R (Part 2): Processing text files</title>
-      <link>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2/</link>
+      <link>/post/2018-01-09-guide-cnlp-part2/</link>
       <pubDate>Tue, 09 Jan 2018 16:20:46 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2/</guid>
+      <guid>/post/2018-01-09-guide-cnlp-part2/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
@@ -109,7 +109,7 @@ freq.upos &amp;lt;- arrange(freq.upos, Var1)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Enter the following code. The first argument should be height, or the y-axis value (here, frequencies):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;barplot(freq.upos$Freq, names.arg = freq.upos$Var1, 
         xlab = &amp;quot;Universal part-of-speech tags&amp;quot;, ylab = &amp;quot;Observed frequencies&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;I’ll make a graph of the top ten most frequent lemma with the package &lt;code&gt;ggplot2&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;top.lem &amp;lt;- subset(freq.lem[1:10,])
 names(top.lem)[1] &amp;lt;- &amp;quot;lemma&amp;quot; #change the variable (column 1) name to &amp;quot;lemma&amp;quot;
@@ -119,7 +119,7 @@ ggplot(top.lem, aes(x = lemma, y = Freq, label = Freq)) +
      geom_text(color = &amp;quot;white&amp;quot;, size = 4, hjust = 1.5) + 
      labs(x = &amp;quot;Lemma&amp;quot;, y = &amp;quot;Frequency&amp;quot;, title = &amp;quot;Top 10 most frequent lemmas&amp;quot;) + 
      coord_flip() + theme_minimal()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;While the graph looks neat, one thing that bothers me is that spaCy lemmatizes all pronouns as “-PRON-”. This algorithm not only fails to distinguish between the first, second, and third person pronouns but also the hyphens can cause some issues with data handling. I’d run a code to re-lemmatize all pronouns if I wanted to include them in my analysis.&lt;/p&gt;
 &lt;p&gt;If you just need to tag texts for concordancing, it is much faster and appropriate to use existing software such as &lt;a href=&#34;http://www.laurenceanthony.net/software/tagant/&#34;&gt;TagAnt&lt;/a&gt; (Anthony, 2015). The tools I’ve used here are effective for data analysis.&lt;/p&gt;
 &lt;p&gt;I’ll continue to post, for my own documentation purpose, tools and techniques related to NLP and corpus analysis.&lt;/p&gt;
@@ -130,9 +130,9 @@ ggplot(top.lem, aes(x = lemma, y = Freq, label = Freq)) +
     
     <item>
       <title>A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP</title>
-      <link>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/</link>
+      <link>/post/2018-01-09-guide-cnlp-part1/</link>
       <pubDate>Tue, 09 Jan 2018 16:10:46 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2018-01-09-guide-cnlp-part1/</guid>
+      <guid>/post/2018-01-09-guide-cnlp-part1/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
