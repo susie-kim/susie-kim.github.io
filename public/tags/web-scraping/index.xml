@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>web scraping | Susie Kim</title>
-    <link>https://susie-kim.github.io/tags/web-scraping/</link>
-      <atom:link href="https://susie-kim.github.io/tags/web-scraping/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/web-scraping/</link>
+      <atom:link href="/tags/web-scraping/index.xml" rel="self" type="application/rss+xml" />
     <description>web scraping</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Sat, 12 Jan 2019 12:30:00 -0500</lastBuildDate>
     <image>
-      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <url>/img/icon-192.png</url>
       <title>web scraping</title>
-      <link>https://susie-kim.github.io/tags/web-scraping/</link>
+      <link>/tags/web-scraping/</link>
     </image>
     
     <item>
       <title>Web Scraping with R: A Great Resource for Language Learning and Teaching</title>
-      <link>https://susie-kim.github.io/post/2019-01-12-web-scraping/</link>
+      <link>/post/2019-01-12-web-scraping/</link>
       <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/post/2019-01-12-web-scraping/</guid>
+      <guid>/post/2019-01-12-web-scraping/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
