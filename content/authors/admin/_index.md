@@ -74,8 +74,8 @@ email: ""
 
 I am an applied linguist and language teacher, currently working as a Lecturer in Korean Language for the [Department of East Asian Studies](https://eas.princeton.edu) at Princeton University. 
 
-My main research interest sits at the intersection of language assessment, second language writing, language proficiency standards (e.g., CEFR, ACTFL), and corpus-based methods. Thus far, I have primarily focused on linguistic characteristics and textual features of second language (L2) English at various proficiency levels. I plan to direct these interests toward desgining standards-based practices for foreign language programs and building/analyzing Korean language corpora for teaching purposes.
+My main research interest sits at the intersection of language assessment, second language writing, language proficiency standards (e.g., CEFR, ACTFL), and corpus-based methods. Thus far, I have primarily focused on investigating linguistic characteristics and textual features of second language (L2) English at various proficiency levels. I plan to direct these interests toward desgining standards-based practices for foreign language programs and building/analyzing Korean language corpora for teaching purposes.
 
-I have a wide range of personal interests and, though amateur, enjoy: traveling and nature photography, night sky photography, Major League Baseball and statistics, R programming, playing the guitar, making coffee, and cooking.
+I have a wide range of personal interests and, though amateur, enjoy: traveling and nature photography, night sky photography, Major League Baseball and statistics, and R programming. 
 
-On this website, I share research tools and methods as I work through them for my academic projects or personal activities. Feel free to explore, leave comments, or contact me!
+On this website, I share some research tools and methods as I work through them for my academic projects or personal enjoyment. Feel free to explore, leave comments, and/or contact me!

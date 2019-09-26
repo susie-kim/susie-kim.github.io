@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>research | Susie Kim</title>
-    <link>https://susie-kim.github.io/tags/research/</link>
-      <atom:link href="https://susie-kim.github.io/tags/research/index.xml" rel="self" type="application/rss+xml" />
+    <link>/tags/research/</link>
+      <atom:link href="/tags/research/index.xml" rel="self" type="application/rss+xml" />
     <description>research</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Thu, 27 Dec 2018 00:00:00 -0500</lastBuildDate>
     <image>
-      <url>https://susie-kim.github.io/img/icon-192.png</url>
+      <url>/img/icon-192.png</url>
       <title>research</title>
-      <link>https://susie-kim.github.io/tags/research/</link>
+      <link>/tags/research/</link>
     </image>
     
     <item>
       <title>Studies on Korean learning and teaching</title>
-      <link>https://susie-kim.github.io/project/research-topic-2/</link>
+      <link>/project/research-topic-2/</link>
       <pubDate>Thu, 27 Dec 2018 00:00:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/project/research-topic-2/</guid>
+      <guid>/project/research-topic-2/</guid>
       <description>&lt;p&gt;These are the studies on this topic that I have published and presented at various conferences:&lt;/p&gt;
 
 &lt;ul&gt;
