@@ -192,7 +192,7 @@ With further text processing, corpora of different characters from the show can 
 
 # . Example 3: Scraping Online Newspapers
 
-In this last example, I scrape recent articles from the [Social Issues Opinion](https://www.cnn.com/specials/opinion/opinion-social-issues) section on *CNN*. Your result will be different from what appears on this post because this list of articles is constantly being updated. 
+In this last example, I scrape recent articles from the [Social Issues Opinion](https://www.cnn.com/specials/opinion/opinion-social-issues) section on *CNN*. Your result will be different from what appears on this post because this list of articles is constantly being updated. Be sure to comply with the [terms of use](https://www.cnn.com/terms) and not violate their copyright.
 
 ## . Social Commentary from CNN
 
