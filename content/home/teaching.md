@@ -14,7 +14,7 @@ subtitle = ""
 weight = 75
 
 +++
-I am a teaching instructor for the following courses (2019-2020) at Princeton University:
+I am a lecturer for the following courses (2019-2020) at Princeton University:
 
 - KOR101/102: Elementary Korean
-- KOR105/106: Intermediate Korean
+- KOR105/107: Intermediate Korean
