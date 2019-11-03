@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>xml | Susie Kim</title>
-    <link>/tags/xml/</link>
-      <atom:link href="/tags/xml/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://susie-kim.github.io/tags/xml/</link>
+      <atom:link href="https://susie-kim.github.io/tags/xml/index.xml" rel="self" type="application/rss+xml" />
     <description>xml</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Fri, 04 May 2018 10:34:40 -0500</lastBuildDate>
     <image>
-      <url>/img/icon-192.png</url>
+      <url>https://susie-kim.github.io/img/icon-192.png</url>
       <title>xml</title>
-      <link>/tags/xml/</link>
+      <link>https://susie-kim.github.io/tags/xml/</link>
     </image>
     
     <item>
       <title>Working with XML-formatted text annotations in R</title>
-      <link>/post/2018-05-04-working-xml/</link>
+      <link>https://susie-kim.github.io/post/2018-05-04-working-xml/</link>
       <pubDate>Fri, 04 May 2018 10:34:40 -0500</pubDate>
-      <guid>/post/2018-05-04-working-xml/</guid>
+      <guid>https://susie-kim.github.io/post/2018-05-04-working-xml/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
