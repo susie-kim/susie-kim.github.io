@@ -8,14 +8,14 @@ light = true
 primary = "#333333"
 
 # Links
-link = "#67A9CF"
-link_hover = "#ECE2F0"
+link = "#225EA8"
+link_hover = "#F7FBFF"
 
 # Menu
 menu_primary = "#333333"
-menu_text = "#FFF7FB"
-menu_text_active = "#ECE2F0"
-menu_title = "#ECE2F0"
+menu_text = "#F7FBFF"
+menu_text_active = "#225EA8"
+menu_title = "#F7FBFF"
 
 # Home sections
 home_section_odd = "rgb(238, 236, 233)"
