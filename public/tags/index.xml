@@ -5,7 +5,7 @@
     <link>https://susie-kim.github.io/tags/</link>
       <atom:link href="https://susie-kim.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <description>Tags</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Sat, 12 Jan 2019 12:30:00 -0500</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Tue, 01 Jan 2019 20:00:00 -0500</lastBuildDate>
     <image>
       <url>https://susie-kim.github.io/img/icon-192.png</url>
       <title>Tags</title>
@@ -13,33 +13,25 @@
     </image>
     
     <item>
+      <title>corenlp</title>
+      <link>https://susie-kim.github.io/tags/corenlp/</link>
+      <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
+      <guid>https://susie-kim.github.io/tags/corenlp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>corpus analysis</title>
       <link>https://susie-kim.github.io/tags/corpus-analysis/</link>
-      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
       <guid>https://susie-kim.github.io/tags/corpus-analysis/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>language learning</title>
-      <link>https://susie-kim.github.io/tags/language-learning/</link>
-      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/tags/language-learning/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>language teaching</title>
-      <link>https://susie-kim.github.io/tags/language-teaching/</link>
-      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/tags/language-teaching/</guid>
       <description></description>
     </item>
     
     <item>
       <title>R</title>
       <link>https://susie-kim.github.io/tags/r/</link>
-      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
       <guid>https://susie-kim.github.io/tags/r/</guid>
       <description></description>
     </item>
@@ -47,24 +39,8 @@
     <item>
       <title>text analysis</title>
       <link>https://susie-kim.github.io/tags/text-analysis/</link>
-      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/tags/text-analysis/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>web scraping</title>
-      <link>https://susie-kim.github.io/tags/web-scraping/</link>
-      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/tags/web-scraping/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>corenlp</title>
-      <link>https://susie-kim.github.io/tags/corenlp/</link>
       <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
-      <guid>https://susie-kim.github.io/tags/corenlp/</guid>
+      <guid>https://susie-kim.github.io/tags/text-analysis/</guid>
       <description></description>
     </item>
     
