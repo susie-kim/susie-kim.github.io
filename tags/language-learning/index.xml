@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>language learning | Susie Kim</title>
-    <link>/tags/language-learning/</link>
-      <atom:link href="/tags/language-learning/index.xml" rel="self" type="application/rss+xml" />
+    <link>https://susie-kim.github.io/tags/language-learning/</link>
+      <atom:link href="https://susie-kim.github.io/tags/language-learning/index.xml" rel="self" type="application/rss+xml" />
     <description>language learning</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Sat, 12 Jan 2019 12:30:00 -0500</lastBuildDate>
     <image>
-      <url>/img/icon-192.png</url>
+      <url>https://susie-kim.github.io/img/icon-192.png</url>
       <title>language learning</title>
-      <link>/tags/language-learning/</link>
+      <link>https://susie-kim.github.io/tags/language-learning/</link>
     </image>
     
     <item>
       <title>Web Scraping with R: A Great Resource for Language Learning and Teaching</title>
-      <link>/post/2019-01-12-web-scraping/</link>
+      <link>https://susie-kim.github.io/post/2019-01-12-web-scraping/</link>
       <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
-      <guid>/post/2019-01-12-web-scraping/</guid>
+      <guid>https://susie-kim.github.io/post/2019-01-12-web-scraping/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
@@ -305,8 +305,9 @@ for (n in 1:nrow(sc_ex)) {
 &lt;li&gt;Use the scraped data to show how language is used for what purposes&lt;/li&gt;
 &lt;li&gt;Have students reconstruct the genre or conversation using the word list and make comparisonss&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;This post was inspired by the course, LLT 809: Teaching Second Language Reading and Writing (Instructor: Dr. Charlene Polio). Please feel free to share your thoughts!&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Codes were last updated on 09/25/2019.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;This post was inspired by the course, LLT 809: Teaching Second Language Reading and Writing (Instructor: Dr. Charlene Polio). Please feel free to share your thoughts!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&#34;footnotes&#34;&gt;
 &lt;hr /&gt;
