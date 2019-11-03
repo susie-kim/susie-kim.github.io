@@ -1,54 +1,74 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
     <loc>https://susie-kim.github.io/categories/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://susie-kim.github.io/tags/corenlp/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
   </url>
   
   <url>
     <loc>https://susie-kim.github.io/categories/corpus/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
   </url>
   
   <url>
     <loc>https://susie-kim.github.io/tags/corpus-analysis/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://susie-kim.github.io/tags/language-learning/</loc>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://susie-kim.github.io/tags/language-teaching/</loc>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
   </url>
   
   <url>
     <loc>https://susie-kim.github.io/post/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://susie-kim.github.io/categories/r/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
   </url>
   
   <url>
     <loc>https://susie-kim.github.io/tags/r/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://susie-kim.github.io/categories/r/</loc>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
   </url>
   
   <url>
     <loc>https://susie-kim.github.io/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
   </url>
   
   <url>
     <loc>https://susie-kim.github.io/tags/</loc>
-    <lastmod>2019-01-01T20:00:00-05:00</lastmod>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
   </url>
   
   <url>
     <loc>https://susie-kim.github.io/tags/text-analysis/</loc>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://susie-kim.github.io/tags/web-scraping/</loc>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://susie-kim.github.io/post/2019-01-12-web-scraping/</loc>
+    <lastmod>2019-01-12T12:30:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://susie-kim.github.io/tags/corenlp/</loc>
     <lastmod>2019-01-01T20:00:00-05:00</lastmod>
   </url>
   
@@ -174,11 +194,6 @@
   
   <url>
     <loc>https://susie-kim.github.io/authors/admin/</loc>
-  </url>
-  
-  <url>
-    <loc>https://susie-kim.github.io/post/2019-01-12-web-scraping/</loc>
-    <priority>0</priority>
   </url>
   
   <url>

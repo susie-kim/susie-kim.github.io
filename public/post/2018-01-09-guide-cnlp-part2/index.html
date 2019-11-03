@@ -78,7 +78,7 @@
   
   
   
-  <link rel="stylesheet" href="https://susie-kim.github.io/css/academic.min.51d674dea473c3127e8a6f2e909e3b05.css">
+  <link rel="stylesheet" href="https://susie-kim.github.io/css/academic.min.f6e437051182e8e9f81af591451de244.css">
 
   
 
@@ -621,11 +621,11 @@ all.text &lt;- cnlp_annotate(&quot;corpus/*.txt&quot;, as_strings = FALSE)</code
 <p>Again, simple! The package has annotated all .txt files under the folder corpus, and the results are saved in a data list named all.text. Something you might want to check at this point is whether all files in your folder are analyzed. Type and execute:</p>
 <pre class="r"><code>cnlp_get_document(all.text)</code></pre>
 <pre><code>##     id                 time version       language                uri
-## 1 doc1 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_01.txt
-## 2 doc2 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_02.txt
-## 3 doc3 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_03.txt
-## 4 doc4 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_04.txt
-## 5 doc5 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_05.txt</code></pre>
+## 1 doc1 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_01.txt
+## 2 doc2 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_02.txt
+## 3 doc3 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_03.txt
+## 4 doc4 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_04.txt
+## 5 doc5 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_05.txt</code></pre>
 <p>With this example, it shows 5 files that I’ve just processed. If you have more than 10 files, the console pane won’t display the entire list, so you might want to save this data table as a data frame to view it.</p>
 <pre class="r"><code>texts.doc &lt;- cnlp_get_document(all.text)</code></pre>
 <p>Then of course you have all annotated objects that you can retrieve as I have previous talked about:</p>

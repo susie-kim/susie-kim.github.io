@@ -85,7 +85,7 @@ ntoken(ex)&lt;/code&gt;&lt;/pre&gt;
 ##  text_05.txt   183    372        13
 ## 
 ## Source: D:/GitHub/susie-kim.github.io/content/post/* on x86-64 by susie
-## Created: Tue Sep 10 16:00:09 2019
+## Created: Sun Nov 03 12:43:13 2019
 ## Notes:&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The differences range from 5 to 12. I will append this result as &lt;code&gt;Type_word&lt;/code&gt; to the data table for later comparisons.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ntype(tolower(txt$text))&lt;/code&gt;&lt;/pre&gt;
@@ -1317,11 +1317,11 @@ all.text &amp;lt;- cnlp_annotate(&amp;quot;corpus/*.txt&amp;quot;, as_strings = 
 &lt;p&gt;Again, simple! The package has annotated all .txt files under the folder corpus, and the results are saved in a data list named all.text. Something you might want to check at this point is whether all files in your folder are analyzed. Type and execute:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cnlp_get_document(all.text)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##     id                 time version       language                uri
-## 1 doc1 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_01.txt
-## 2 doc2 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_02.txt
-## 3 doc3 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_03.txt
-## 4 doc4 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_04.txt
-## 5 doc5 2019-09-10 19:59:59Z   2.1.8 en_core_web_lg corpus/text_05.txt&lt;/code&gt;&lt;/pre&gt;
+## 1 doc1 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_01.txt
+## 2 doc2 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_02.txt
+## 3 doc3 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_03.txt
+## 4 doc4 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_04.txt
+## 5 doc5 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_05.txt&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;With this example, it shows 5 files that I’ve just processed. If you have more than 10 files, the console pane won’t display the entire list, so you might want to save this data table as a data frame to view it.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;texts.doc &amp;lt;- cnlp_get_document(all.text)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Then of course you have all annotated objects that you can retrieve as I have previous talked about:&lt;/p&gt;

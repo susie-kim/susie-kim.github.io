@@ -85,7 +85,7 @@ ntoken(ex)&lt;/code&gt;&lt;/pre&gt;
 ##  text_05.txt   183    372        13
 ## 
 ## Source: D:/GitHub/susie-kim.github.io/content/post/* on x86-64 by susie
-## Created: Tue Sep 10 16:00:09 2019
+## Created: Sun Nov 03 12:43:13 2019
 ## Notes:&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The differences range from 5 to 12. I will append this result as &lt;code&gt;Type_word&lt;/code&gt; to the data table for later comparisons.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ntype(tolower(txt$text))&lt;/code&gt;&lt;/pre&gt;
