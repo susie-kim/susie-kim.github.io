@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>type on Susie Kim</title>
+    <link>https://susie-kim.github.io/tags/type/</link>
+    <description>Recent content in type on Susie Kim</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 25 Dec 2018 20:00:00 -0500</lastBuildDate><atom:link href="https://susie-kim.github.io/tags/type/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Comparing tools for obtaining word token and type</title>
+      <link>https://susie-kim.github.io/posts/2018-12-25-token-type/</link>
+      <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-12-25-token-type/</guid>
+      <description>1 . Text files 2 . Working with R packages 2.1 . Quanteda 2.2 . Tidytext 3 . Results from Natural Language Processing Tools 3.1 . spacy 3.2 . Stanford CoreNLP 4 . Comparisons 4.1 . Tokens 4.2 . Types When analyzing texts in any context, the most basic linguistic characteristics of the corpus (i.e., texts) to describe are word tokens (i.e., the number of words) and types (i.e., the number of distinct words).</description>
+    </item>
+    
+  </channel>
+</rss>

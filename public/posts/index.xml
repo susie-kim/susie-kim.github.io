@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Susie Kim</title>
+    <link>https://susie-kim.github.io/posts/</link>
+    <description>Recent content in Posts on Susie Kim</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 12 Jan 2019 12:30:00 -0500</lastBuildDate><atom:link href="https://susie-kim.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Web Scraping with R: A Great Resource for Language Learning and Teaching</title>
+      <link>https://susie-kim.github.io/posts/2019-01-12-web-scraping/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2019-01-12-web-scraping/</guid>
+      <description>1 . Introduction 1.1 . Tools Needed 2 . Example 1: Scraping Webpages 2.1 . Wikipedia entries 2.2 . More ideas 3 . Example 2: Scraping Blogs 3.1 . The Big Bang Theory transcripts 3.2 . More ideas 4 . Example 3: Scraping Online Newspapers 4.1 . Social Commentary from CNN 4.2 . More ideas 5 . Summary 1 . Introduction Recently, I helped a colleague scrape text from Wikipedia for a class project.</description>
+    </item>
+    
+    <item>
+      <title>Using Stanford CoreNLP with R: Bigram and Trigram Analysis</title>
+      <link>https://susie-kim.github.io/posts/2019-01-01-new-corenlp/</link>
+      <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2019-01-01-new-corenlp/</guid>
+      <description>1 . Preparation 1.1 . Install Java 1.2 . Install cleanNLP and language model 2 . Annotation Using Stanford CoreNLP 3 . Example Text Analysis: Creating Bigrams and Trigrams 3.1 . With tidytext 3.2 . Manually Creating Bigrams and Trigrams 3.3 . Example Analysis: Be + words Forget my previous posts on using the Stanford NLP engine via command and retreiving information from XML files in R…. I’ve found that everything can be done in RStudio (at least I learned more about how to work with XML in R).</description>
+    </item>
+    
+    <item>
+      <title>Comparing tools for obtaining word token and type</title>
+      <link>https://susie-kim.github.io/posts/2018-12-25-token-type/</link>
+      <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-12-25-token-type/</guid>
+      <description>1 . Text files 2 . Working with R packages 2.1 . Quanteda 2.2 . Tidytext 3 . Results from Natural Language Processing Tools 3.1 . spacy 3.2 . Stanford CoreNLP 4 . Comparisons 4.1 . Tokens 4.2 . Types When analyzing texts in any context, the most basic linguistic characteristics of the corpus (i.e., texts) to describe are word tokens (i.e., the number of words) and types (i.e., the number of distinct words).</description>
+    </item>
+    
+    <item>
+      <title>Working with XML-formatted text annotations in R</title>
+      <link>https://susie-kim.github.io/posts/2018-05-04-working-xml/</link>
+      <pubDate>Fri, 04 May 2018 10:34:40 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-05-04-working-xml/</guid>
+      <description>1 . From XML to tagged corpus 1.1 . Creating tagged text 1.2 . Rendering xml to data frame 1.3 . Creating tagged texts 2 . Example query and concordances In this post I’m documenting how to reformat the XML-formatted files outputted by the Stanford CoreNLP tool. This might not be the most elegant way to go about it, but this is something that works for me. Here, I will be using R and the XML files produced in the previous step.</description>
+    </item>
+    
+    <item>
+      <title>A guide to using the Stanford CoreNLP Tools for automatic text annotation</title>
+      <link>https://susie-kim.github.io/posts/2018-04-06-guide-corenlp/</link>
+      <pubDate>Fri, 06 Apr 2018 12:20:40 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-04-06-guide-corenlp/</guid>
+      <description>Stanford CoreNLP tools Parsing As the title suggests, I will guide you through how to automatically annotate raw texts using the Stanford CoreNLP in this post.
+Stanford CoreNLP tools The Stanford CoreNLP is a set of natural language analysis tools written in Java programming language. It takes raw text input then tokenizes each word and parses them into the base forms of words (i.e., lemmas). The users can utilize this set of tools to further parse the text, such as tagging the parts of speech (i.</description>
+    </item>
+    
+    <item>
+      <title>A basic guide to using NLP for corpus analysis with R (Part 2): Processing text files</title>
+      <link>https://susie-kim.github.io/posts/2018-01-09-guide-cnlp-part2/</link>
+      <pubDate>Tue, 09 Jan 2018 16:20:46 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-01-09-guide-cnlp-part2/</guid>
+      <description>1 . Processing text files 1.1 . Annotate a single text 1.2 . Annotate all files in a folder 2 . Describing data 2.1 . Frequency tables 2.2 . Basic visualization If you’re working with language data, you probably want to process text files rather than strings of words you type on to an R script. Here is how to deal with files. Refer to the previous post for setting the tools up if needed.</description>
+    </item>
+    
+    <item>
+      <title>A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP</title>
+      <link>https://susie-kim.github.io/posts/2018-01-09-guide-cnlp-part1/</link>
+      <pubDate>Tue, 09 Jan 2018 16:10:46 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-01-09-guide-cnlp-part1/</guid>
+      <description>1 . Installing Python 1.1 . Download Python 1.2 . Install Python 1.3 . Test if Python works 2 . Installing NLP backend: spaCy 2.1 . Install spacy 2.2 . Download language models 3 . Getting ready with RStudio 3.1 . Install all requirements 3.2 . Processing a text string This is Part 1 of a basic guide for setting up and using a natural language processing (NLP) tool with R.</description>
+    </item>
+    
+  </channel>
+</rss>

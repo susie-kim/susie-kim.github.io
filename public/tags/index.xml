@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Susie Kim</title>
+    <link>https://susie-kim.github.io/tags/</link>
+    <description>Recent content in Tags on Susie Kim</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 12 Jan 2019 12:30:00 -0500</lastBuildDate><atom:link href="https://susie-kim.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>corpus analysis</title>
+      <link>https://susie-kim.github.io/tags/corpus-analysis/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/corpus-analysis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>language learning</title>
+      <link>https://susie-kim.github.io/tags/language-learning/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/language-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>language teaching</title>
+      <link>https://susie-kim.github.io/tags/language-teaching/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/language-teaching/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R</title>
+      <link>https://susie-kim.github.io/tags/r/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>text analysis</title>
+      <link>https://susie-kim.github.io/tags/text-analysis/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/text-analysis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>web scraping</title>
+      <link>https://susie-kim.github.io/tags/web-scraping/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/web-scraping/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>corenlp</title>
+      <link>https://susie-kim.github.io/tags/corenlp/</link>
+      <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/corenlp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tidytext</title>
+      <link>https://susie-kim.github.io/tags/tidytext/</link>
+      <pubDate>Tue, 01 Jan 2019 20:00:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/tidytext/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>corpus</title>
+      <link>https://susie-kim.github.io/tags/corpus/</link>
+      <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/corpus/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>token</title>
+      <link>https://susie-kim.github.io/tags/token/</link>
+      <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/token/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>type</title>
+      <link>https://susie-kim.github.io/tags/type/</link>
+      <pubDate>Tue, 25 Dec 2018 20:00:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/type/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>nlp</title>
+      <link>https://susie-kim.github.io/tags/nlp/</link>
+      <pubDate>Fri, 04 May 2018 10:34:40 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/nlp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>xml</title>
+      <link>https://susie-kim.github.io/tags/xml/</link>
+      <pubDate>Fri, 04 May 2018 10:34:40 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/xml/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cleannlp</title>
+      <link>https://susie-kim.github.io/tags/cleannlp/</link>
+      <pubDate>Tue, 09 Jan 2018 16:20:46 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/cleannlp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>spacy</title>
+      <link>https://susie-kim.github.io/tags/spacy/</link>
+      <pubDate>Tue, 09 Jan 2018 16:20:46 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/tags/spacy/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,1311 @@
+---
+title: "Using Stanford CoreNLP with R: Bigram and Trigram Analysis"
+author: Susie Kim
+date: '2019-01-01T20:00:00-05:00'
+tags: 
+- R
+- corpus analysis
+- text analysis
+- corenlp
+- tidytext
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#preparation"><span class="toc-section-number">1</span> . Preparation</a><ul>
+<li><a href="#install-java"><span class="toc-section-number">1.1</span> . Install Java</a></li>
+<li><a href="#install-cleannlp-and-language-model"><span class="toc-section-number">1.2</span> . Install cleanNLP and language model</a></li>
+</ul></li>
+<li><a href="#annotation-using-stanford-corenlp"><span class="toc-section-number">2</span> . Annotation Using Stanford CoreNLP</a></li>
+<li><a href="#example-text-analysis-creating-bigrams-and-trigrams"><span class="toc-section-number">3</span> . Example Text Analysis: Creating Bigrams and Trigrams</a><ul>
+<li><a href="#with-tidytext"><span class="toc-section-number">3.1</span> . With tidytext</a></li>
+<li><a href="#manually-creating-bigrams-and-trigrams"><span class="toc-section-number">3.2</span> . Manually Creating Bigrams and Trigrams</a></li>
+<li><a href="#example-analysis-be-words"><span class="toc-section-number">3.3</span> . Example Analysis: Be + words</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>Forget my previous posts on <a href="/post/2018-04-06-guide-corenlp">using the Stanford NLP engine via command</a> and <a href="/post/2018-05-04-working-xml">retreiving information from XML files</a> in R…. I’ve found that everything can be done in RStudio (at least I learned more about how to work with XML in R). This post replaces these two previous ones and adds more example analyses.</p>
+<div id="preparation" class="section level1">
+<h1><span class="header-section-number">1</span> . Preparation</h1>
+<div id="install-java" class="section level2">
+<h2><span class="header-section-number">1.1</span> . Install Java</h2>
+<p>Download and install, if you don’t already have in on your computer, the <a href="https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html">Java Development Kit</a>. No specific things to look out for during installation.</p>
+</div>
+<div id="install-cleannlp-and-language-model" class="section level2">
+<h2><span class="header-section-number">1.2</span> . Install cleanNLP and language model</h2>
+<p>The packages we need in R are <code>rJava</code> and <code>cleanNLP</code>. Install the developmental version of <code>cleanNLP</code> as using the (old) CRAN version won’t work properly.</p>
+<pre class="r"><code>install.packages(&quot;rJava&quot;)
+devtools::install_github(&quot;statsmaths/cleanNLP&quot;)</code></pre>
+<pre class="r"><code>library(cleanNLP)
+library(dplyr)</code></pre>
+<p>After loading the package, you can pass an argument to download different language models. The default is set to English so I’m not going to pass anything to the function.</p>
+<pre class="r"><code>cnlp_download_corenlp()</code></pre>
+<p>This will take some time.</p>
+</div>
+</div>
+<div id="annotation-using-stanford-corenlp" class="section level1">
+<h1><span class="header-section-number">2</span> . Annotation Using Stanford CoreNLP</h1>
+<p>Now you can itialize the engine to parse your text. The more annotation features you want to utlize, the higher the <code>anno_level</code> will be. I usually just go for <code>anno_level = 0</code> since I only need tokenization, lemmatization, and part-of-speech tagging. Loading higher level functions takes longer time and can slow down your computer.</p>
+<pre class="r"><code>cnlp_init_corenlp(anno_level = 0)</code></pre>
+<p>I’ll process the same five texts that I’ve been using in this blog, five random essays from the LOCNESS.
+The function below can directly call text files from a directory and annotate them.</p>
+<pre class="r"><code>anno_text &lt;- cnlp_annotate(&quot;corpus/*.txt&quot;, as_strings = FALSE)</code></pre>
+<p>However, I like building the corpus as its own object to keep using it for various analyses.</p>
+<pre class="r"><code>#Build the corpus
+txt_cor &lt;- readtext::readtext(&quot;corpus/*.txt&quot;)
+
+#Save annotations as a table
+txt_ann &lt;- cnlp_annotate(txt_cor)
+txt_tab &lt;- cnlp_get_token(txt_ann)
+
+#Check the first 15 words
+head(txt_tab, 15)</code></pre>
+<pre><code>## # A tibble: 15 x 8
+##    id            sid   tid word     lemma    upos  pos     cid
+##    &lt;chr&gt;       &lt;int&gt; &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;int&gt;
+##  1 text_01.txt     1     1 Two      two      NUM   CD        0
+##  2 text_01.txt     1     2 men      man      NOUN  NNS       4
+##  3 text_01.txt     1     3 ,        ,        .     ,         7
+##  4 text_01.txt     1     4 one      one      NUM   CD        9
+##  5 text_01.txt     1     5 ring     ring     NOUN  NN       13
+##  6 text_01.txt     1     6 ,        ,        .     ,        17
+##  7 text_01.txt     1     7 only     only     ADV   RB       19
+##  8 text_01.txt     1     8 one      one      NUM   CD       24
+##  9 text_01.txt     1     9 can      can      VERB  MD       28
+## 10 text_01.txt     1    10 leave    leave    VERB  VB       32
+## 11 text_01.txt     1    11 .        .        .     .        37
+## 12 text_01.txt     2     1 Dramatic dramatic ADJ   JJ       39
+## 13 text_01.txt     2     2 it       it       PRON  PRP      48
+## 14 text_01.txt     2     3 may      may      VERB  MD       51
+## 15 text_01.txt     2     4 be       be       VERB  VB       55</code></pre>
+<p>It appears that everything worked well. Next, I’ll do some text analysis.</p>
+</div>
+<div id="example-text-analysis-creating-bigrams-and-trigrams" class="section level1">
+<h1><span class="header-section-number">3</span> . Example Text Analysis: Creating Bigrams and Trigrams</h1>
+<div id="with-tidytext" class="section level2">
+<h2><span class="header-section-number">3.1</span> . With tidytext</h2>
+<p><code>tidytext</code> is a convenient means to perform text analysis. package. Luckily, free resources are available such as <a href="https://www.tidytextmining.com/">Tidytext</a> that will serve as a structured, useful guide.</p>
+<pre class="r"><code>library(tidytext)</code></pre>
+<p>This package includes some functions that are easy to use. We used the corenlp to POS tag the text but if we didn’t need that, we could have just tokenized using the <code>unnest_tokens()</code> function as I have done in the previous post.</p>
+<p><code>unnest_token()</code> first takes the data frame (<code>txt_cor</code>). The default setting breaks the text into words (i.e., tokenizes) and creates a new data frame. We need to provide the name of the column for this new data frame (output, I named it <code>word</code>) and the column that includes the text data (input, which is <code>text</code>).</p>
+<pre class="r"><code>tidy_tok &lt;- txt_cor %&gt;% unnest_tokens(word, text)</code></pre>
+<p>Analyzing n-grams is done with the same function. We can just provide different values to generate a table of n-grams. The first following code takes the corpus and creates a new data frame (<code>tidy_bi</code>) with the column <code>bigram</code> that contains the bigram. <code>token = "ngrams"</code> and <code>n =2</code> will extract two-word sequences. The second code will create a list of trigrams.</p>
+<pre class="r"><code>tidy_bi &lt;- txt_cor %&gt;% unnest_tokens(bigram, text, token = &quot;ngrams&quot;, n = 2)
+tidy_tri &lt;- txt_cor %&gt;% unnest_tokens(trigram, text, token = &quot;ngrams&quot;, n = 3)</code></pre>
+<table class="table table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+bigram
+</th>
+<th style="text-align:left;">
+trigram
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+two men
+</td>
+<td style="text-align:left;">
+two men one
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+men one
+</td>
+<td style="text-align:left;">
+men one ring
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+one ring
+</td>
+<td style="text-align:left;">
+one ring only
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ring only
+</td>
+<td style="text-align:left;">
+ring only one
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+only one
+</td>
+<td style="text-align:left;">
+only one can
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+one can
+</td>
+<td style="text-align:left;">
+one can leave
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+can leave
+</td>
+<td style="text-align:left;">
+can leave dramatic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+leave dramatic
+</td>
+<td style="text-align:left;">
+leave dramatic it
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dramatic it
+</td>
+<td style="text-align:left;">
+dramatic it may
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+it may
+</td>
+<td style="text-align:left;">
+it may be
+</td>
+</tr>
+</tbody>
+</table>
+<p>Coming from a linguistics perspective, I find it potentially problematic that the bigrams include word chunks that are not meaningful, especially for qualitative text analysis. What I mean is that, for example, the last word of sentence #1 and the first word of sentence #2, “it dramatically”, are treated as a bigram. Same applies to words within a sentence that are separated by commas or other punctuation. Consider the first couple sentences from our corpus:</p>
+<blockquote>
+<p>“Two men, one ring, only one can leave. Dramatic it may be but…”</p>
+</blockquote>
+<p>“men one” is not meaningful, “ring only” is not meaningful. Punctuation serves specific purposes in writing, and ignoring them might fail to deliver meaningful results. Crossing such borders can also lead to misleading results. The meaningful, uninterrupted n-grams are called “CollGrams” by some researchers (Bestgen &amp; Granger, 2014)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
+</div>
+<div id="manually-creating-bigrams-and-trigrams" class="section level2">
+<h2><span class="header-section-number">3.2</span> . Manually Creating Bigrams and Trigrams</h2>
+<p>For this reason, I’ll go back to the annotated data we created earlier. To inspect sequences of words, we can use the <code>lead()</code> function from the <code>dplyr</code> package, to create new columns that contain information regarding the next row of each word.</p>
+<pre class="r"><code>txt_df &lt;- txt_tab %&gt;% 
+  mutate(second_word = lead(word), second_upos = lead(upos), second_pos = lead(pos), 
+         third_word = lead(word, 2), third_upos = lead(upos, 2), third_pos = lead(pos, 2))</code></pre>
+<table class="table table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+sid
+</th>
+<th style="text-align:right;">
+tid
+</th>
+<th style="text-align:left;">
+word
+</th>
+<th style="text-align:left;">
+lemma
+</th>
+<th style="text-align:left;">
+upos
+</th>
+<th style="text-align:left;">
+pos
+</th>
+<th style="text-align:left;">
+second_word
+</th>
+<th style="text-align:left;">
+second_upos
+</th>
+<th style="text-align:left;">
+second_pos
+</th>
+<th style="text-align:left;">
+third_word
+</th>
+<th style="text-align:left;">
+third_upos
+</th>
+<th style="text-align:left;">
+third_pos
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+Two
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+two
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+NUM
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+CD
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+men
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+NOUN
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+NNS
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+men
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+man
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+NOUN
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+NNS
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+one
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+NUM
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+CD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+one
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+NUM
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+CD
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+ring
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+NOUN
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+NN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+one
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+one
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+NUM
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+CD
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+ring
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+NOUN
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+NN
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+ring
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+ring
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+NOUN
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+NN
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+only
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+ADV
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+RB
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+,
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+only
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+ADV
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+RB
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+one
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+NUM
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+CD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+only
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+only
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+ADV
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+RB
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+one
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+NUM
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+CD
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+can
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+VERB
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+MD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+one
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+one
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+NUM
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+CD
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+can
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+VERB
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+MD
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+leave
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+VERB
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+VB
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+can
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+can
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+VERB
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+MD
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+leave
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+VERB
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+VB
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+leave
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+leave
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+VERB
+</td>
+<td style="text-align:left;background-color: #f9f2f4 !important;">
+VB
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e6f3e6 !important;">
+.
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+Dramatic
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+ADJ
+</td>
+<td style="text-align:left;background-color: #e7e7f4 !important;">
+JJ
+</td>
+</tr>
+</tbody>
+</table>
+<p>In the newly created columns in light green are information pertaining to the next word, and the columns in light blue are that of the second next word.</p>
+<p>To clean this data, we’ll execute the following code. The <code>unite()</code> function from the <code>tidyr</code> package concatenates the <code>word</code> and <code>second_word</code> to show the biagram. Although where punctuation occurs can be of interest itself (e.g., marking clauses, inserting phrases, etc.), in this post I’ll filter out the bigrams that include any punctuation marks to only consider two- or three-word sequences that co-occur without any interruption.</p>
+<pre class="r"><code>library(tidyr)
+
+txt_bi &lt;- txt_df %&gt;% unite(bigram, word, second_word, sep = &quot; &quot;) %&gt;% 
+  filter(!second_upos == &quot;.&quot;, !upos == &quot;.&quot;) %&gt;% select(1, 4:9)</code></pre>
+<table class="table table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:left;">
+bigram
+</th>
+<th style="text-align:left;">
+lemma
+</th>
+<th style="text-align:left;">
+upos
+</th>
+<th style="text-align:left;">
+pos
+</th>
+<th style="text-align:left;">
+second_upos
+</th>
+<th style="text-align:left;">
+second_pos
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #f9f2f4 !important;">
+Two men
+</td>
+<td style="text-align:left;">
+two
+</td>
+<td style="text-align:left;">
+NUM
+</td>
+<td style="text-align:left;">
+CD
+</td>
+<td style="text-align:left;">
+NOUN
+</td>
+<td style="text-align:left;">
+NNS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #f9f2f4 !important;">
+one ring
+</td>
+<td style="text-align:left;">
+one
+</td>
+<td style="text-align:left;">
+NUM
+</td>
+<td style="text-align:left;">
+CD
+</td>
+<td style="text-align:left;">
+NOUN
+</td>
+<td style="text-align:left;">
+NN
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #f9f2f4 !important;">
+only one
+</td>
+<td style="text-align:left;">
+only
+</td>
+<td style="text-align:left;">
+ADV
+</td>
+<td style="text-align:left;">
+RB
+</td>
+<td style="text-align:left;">
+NUM
+</td>
+<td style="text-align:left;">
+CD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #f9f2f4 !important;">
+one can
+</td>
+<td style="text-align:left;">
+one
+</td>
+<td style="text-align:left;">
+NUM
+</td>
+<td style="text-align:left;">
+CD
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #f9f2f4 !important;">
+can leave
+</td>
+<td style="text-align:left;">
+can
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+VB
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #f9f2f4 !important;">
+Dramatic it
+</td>
+<td style="text-align:left;">
+dramatic
+</td>
+<td style="text-align:left;">
+ADJ
+</td>
+<td style="text-align:left;">
+JJ
+</td>
+<td style="text-align:left;">
+PRON
+</td>
+<td style="text-align:left;">
+PRP
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #f9f2f4 !important;">
+it may
+</td>
+<td style="text-align:left;">
+it
+</td>
+<td style="text-align:left;">
+PRON
+</td>
+<td style="text-align:left;">
+PRP
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #f9f2f4 !important;">
+may be
+</td>
+<td style="text-align:left;">
+may
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+VB
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>txt_tri &lt;- txt_df %&gt;% unite(trigram, word, second_word, third_word, sep = &quot; &quot;) %&gt;% 
+  filter(!third_upos == &quot;.&quot;, !second_upos == &quot;.&quot;, !upos == &quot;.&quot;) %&gt;% select(1, 4:11)</code></pre>
+<table class="table table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:left;">
+trigram
+</th>
+<th style="text-align:left;">
+lemma
+</th>
+<th style="text-align:left;">
+upos
+</th>
+<th style="text-align:left;">
+pos
+</th>
+<th style="text-align:left;">
+second_upos
+</th>
+<th style="text-align:left;">
+second_pos
+</th>
+<th style="text-align:left;">
+third_upos
+</th>
+<th style="text-align:left;">
+third_pos
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #e6f3e6 !important;">
+only one can
+</td>
+<td style="text-align:left;">
+only
+</td>
+<td style="text-align:left;">
+ADV
+</td>
+<td style="text-align:left;">
+RB
+</td>
+<td style="text-align:left;">
+NUM
+</td>
+<td style="text-align:left;">
+CD
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #e6f3e6 !important;">
+one can leave
+</td>
+<td style="text-align:left;">
+one
+</td>
+<td style="text-align:left;">
+NUM
+</td>
+<td style="text-align:left;">
+CD
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+VB
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #e6f3e6 !important;">
+Dramatic it may
+</td>
+<td style="text-align:left;">
+dramatic
+</td>
+<td style="text-align:left;">
+ADJ
+</td>
+<td style="text-align:left;">
+JJ
+</td>
+<td style="text-align:left;">
+PRON
+</td>
+<td style="text-align:left;">
+PRP
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #e6f3e6 !important;">
+it may be
+</td>
+<td style="text-align:left;">
+it
+</td>
+<td style="text-align:left;">
+PRON
+</td>
+<td style="text-align:left;">
+PRP
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+VB
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #e6f3e6 !important;">
+may be but
+</td>
+<td style="text-align:left;">
+may
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+MD
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+VB
+</td>
+<td style="text-align:left;">
+CONJ
+</td>
+<td style="text-align:left;">
+CC
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #e6f3e6 !important;">
+be but basically
+</td>
+<td style="text-align:left;">
+be
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+VB
+</td>
+<td style="text-align:left;">
+CONJ
+</td>
+<td style="text-align:left;">
+CC
+</td>
+<td style="text-align:left;">
+ADV
+</td>
+<td style="text-align:left;">
+RB
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #e6f3e6 !important;">
+but basically that
+</td>
+<td style="text-align:left;">
+but
+</td>
+<td style="text-align:left;">
+CONJ
+</td>
+<td style="text-align:left;">
+CC
+</td>
+<td style="text-align:left;">
+ADV
+</td>
+<td style="text-align:left;">
+RB
+</td>
+<td style="text-align:left;">
+DET
+</td>
+<td style="text-align:left;">
+DT
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+text_01.txt
+</td>
+<td style="text-align:left;font-weight: bold;background-color: #e6f3e6 !important;">
+basically that is
+</td>
+<td style="text-align:left;">
+basically
+</td>
+<td style="text-align:left;">
+ADV
+</td>
+<td style="text-align:left;">
+RB
+</td>
+<td style="text-align:left;">
+DET
+</td>
+<td style="text-align:left;">
+DT
+</td>
+<td style="text-align:left;">
+VERB
+</td>
+<td style="text-align:left;">
+VBZ
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="example-analysis-be-words" class="section level2">
+<h2><span class="header-section-number">3.3</span> . Example Analysis: Be + words</h2>
+<p>What’s the most common part of speech that comes after the “be” verb? What does it say about the role of the “be” verb and the constituent that follows?</p>
+<pre class="r"><code>txt_bi %&gt;% filter(lemma == &quot;be&quot;) %&gt;% count(second_upos, sort = TRUE)</code></pre>
+<p>Largely, “be” is most frequently followed by another verb. Looking at the POS tag reveals a bit more information.</p>
+<pre class="r"><code>txt_bi %&gt;% filter(lemma == &quot;be&quot;) %&gt;% count(second_pos, sort = TRUE)</code></pre>
+<p>The “be” verb most frequently co-occurs with another verb in the past participle form (i.e., VBN), so presumably the 34 occurrences are passive constructions, in which “be” serves as an auxiliary.</p>
+<p>It’s almost certain that a determiner starts a noun phrase, thus in 27 cases the “be” verb is a main verb and is followed by a noun phrase complement.</p>
+<p><img src="/post/2019-01-01-new-corenlp_files/figure-html/unnamed-chunk-19-1.png" width="864" style="display: block; margin: auto auto auto 0;" /></p>
+<pre class="r"><code>txt_bi %&gt;% filter(lemma == &quot;be&quot;, second_pos == &quot;VBN&quot;) %&gt;% select(bigram)</code></pre>
+<pre><code>## # A tibble: 34 x 1
+##    bigram        
+##    &lt;chr&gt;         
+##  1 been made     
+##  2 be banned     
+##  3 is argued     
+##  4 been won      
+##  5 be banned     
+##  6 was put       
+##  7 be prepared   
+##  8 are surrounded
+##  9 are trained   
+## 10 are paid      
+## # ... with 24 more rows</code></pre>
+<p>The third most frequently co-occuring tag is the adverb. The question is then, what follows an adverb? Considering that verb past participle is the category that appears most frequently after “be”, it could be that an adverb is inserted between these two verbs (<em>be</em> + adverb + past participle; e.g., <em>is actually made</em>).</p>
+<p>It is also possible that the adverb is part of an adjective phrase (e.g., <em>is really important</em>), which in turn, may or may not constitute a noun phrase (e.g., <em>is really an important </em>). Let’s dig a little deeper by looking at the trigrams.</p>
+<pre class="r"><code>txt_tri %&gt;% 
+    filter(lemma == &quot;be&quot;, second_pos == &quot;RB&quot;) %&gt;% 
+    count(third_pos, sort = TRUE) %&gt;% 
+    mutate(percent = round(n*100/sum(n), 1))</code></pre>
+<pre><code>## # A tibble: 10 x 3
+##    third_pos     n percent
+##    &lt;chr&gt;     &lt;int&gt;   &lt;dbl&gt;
+##  1 JJ            9    34.6
+##  2 DT            4    15.4
+##  3 RB            4    15.4
+##  4 VBG           2     7.7
+##  5 VBN           2     7.7
+##  6 CD            1     3.8
+##  7 IN            1     3.8
+##  8 RBR           1     3.8
+##  9 TO            1     3.8
+## 10 WRB           1     3.8</code></pre>
+<p>It appears that many of the “be + adverb” sequences (34.6%) are followed by an adjective, such as:</p>
+<pre class="r"><code>txt_tri %&gt;% 
+  filter(lemma == &quot;be&quot;, second_pos == &quot;RB&quot;, third_pos == &quot;JJ&quot;) %&gt;% 
+  select(trigram)</code></pre>
+<pre><code>## # A tibble: 9 x 1
+##   trigram             
+##   &lt;chr&gt;               
+## 1 are already few     
+## 2 were not stupid     
+## 3 is not right        
+## 4 is very popular     
+## 5 is always much      
+## 6 is clearly aware    
+## 7 is hardly surprising
+## 8 is very likely      
+## 9 be very severe</code></pre>
+<p>However, to determine the exact structure, we need to go further. We can look at the sentence where each trigram occurs.</p>
+<table class="table table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+trigram
+</th>
+<th style="text-align:left;">
+sentence
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+are already few
+</td>
+<td style="text-align:left;">
+first of all, there are already few enough liberties in this country when compared with other nations of similar political and economic conditions such as france and the united states.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+were not stupid
+</td>
+<td style="text-align:left;">
+these men were professionals, they were not stupid.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+is not right
+</td>
+<td style="text-align:left;">
+the people who want the sport to be banned, say this because it is not right for people to fight, and there is a too high risk of serious injury and brain damage caused by the severe pounding that the head takes during a boxing match.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+is very popular
+</td>
+<td style="text-align:left;">
+another reason not to ban boxing is because it is very popular, and millions of people worldwide get entertained by watching boxing, so why should it banned it will cause displeasure to so many people.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+is always much
+</td>
+<td style="text-align:left;">
+there is always much speculation over the dangers of such a brutal sport as boxing.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+is clearly aware
+</td>
+<td style="text-align:left;">
+he is clearly aware of the dangers and brutalism of the sport, which is possibly why he enjoys it so much.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+is hardly surprising
+</td>
+<td style="text-align:left;">
+it is hardly surprising how important the sport can be to some.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+is very likely
+</td>
+<td style="text-align:left;">
+so, a boxer who has been boxing for a number of years, ten for example, and retires is very likely to have brain damage and it could be very severe or hardly noticable but the damage is still there.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; font-weight: bold;">
+be very severe
+</td>
+<td style="text-align:left;">
+so, a boxer who has been boxing for a number of years, ten for example, and retires is very likely to have brain damage and it could be very severe or hardly noticable but the damage is still there.
+</td>
+</tr>
+</tbody>
+</table>
+<p>As a very rough summary, we can say that out of 127 cases where the verb “be” was used, 40 were auxiliary be, consisting passive voice constructions and progressive forms. In other times, the verb was frequently followed by a noun phrase (at least 31 times) or an adjective phrase that may or may not be embedded in a noun phrase.</p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Bestgen, Y., &amp; Granger, S. (2014). Quantifying the development of phraseological competence in L2 English writing: An automated approach. <em>Journal of Second Language Writing</em>, <em>26</em>, 28-41. <a href="https://doi.org/10.1016/j.jslw.2014.09.004" class="uri">https://doi.org/10.1016/j.jslw.2014.09.004</a>.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</div>

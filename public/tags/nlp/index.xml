@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>nlp on Susie Kim</title>
+    <link>https://susie-kim.github.io/tags/nlp/</link>
+    <description>Recent content in nlp on Susie Kim</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 04 May 2018 10:34:40 -0500</lastBuildDate><atom:link href="https://susie-kim.github.io/tags/nlp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Working with XML-formatted text annotations in R</title>
+      <link>https://susie-kim.github.io/posts/2018-05-04-working-xml/</link>
+      <pubDate>Fri, 04 May 2018 10:34:40 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-05-04-working-xml/</guid>
+      <description>1 . From XML to tagged corpus 1.1 . Creating tagged text 1.2 . Rendering xml to data frame 1.3 . Creating tagged texts 2 . Example query and concordances In this post I’m documenting how to reformat the XML-formatted files outputted by the Stanford CoreNLP tool. This might not be the most elegant way to go about it, but this is something that works for me. Here, I will be using R and the XML files produced in the previous step.</description>
+    </item>
+    
+    <item>
+      <title>A guide to using the Stanford CoreNLP Tools for automatic text annotation</title>
+      <link>https://susie-kim.github.io/posts/2018-04-06-guide-corenlp/</link>
+      <pubDate>Fri, 06 Apr 2018 12:20:40 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-04-06-guide-corenlp/</guid>
+      <description>Stanford CoreNLP tools Parsing As the title suggests, I will guide you through how to automatically annotate raw texts using the Stanford CoreNLP in this post.
+Stanford CoreNLP tools The Stanford CoreNLP is a set of natural language analysis tools written in Java programming language. It takes raw text input then tokenizes each word and parses them into the base forms of words (i.e., lemmas). The users can utilize this set of tools to further parse the text, such as tagging the parts of speech (i.</description>
+    </item>
+    
+    <item>
+      <title>A basic guide to using NLP for corpus analysis with R (Part 2): Processing text files</title>
+      <link>https://susie-kim.github.io/posts/2018-01-09-guide-cnlp-part2/</link>
+      <pubDate>Tue, 09 Jan 2018 16:20:46 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-01-09-guide-cnlp-part2/</guid>
+      <description>1 . Processing text files 1.1 . Annotate a single text 1.2 . Annotate all files in a folder 2 . Describing data 2.1 . Frequency tables 2.2 . Basic visualization If you’re working with language data, you probably want to process text files rather than strings of words you type on to an R script. Here is how to deal with files. Refer to the previous post for setting the tools up if needed.</description>
+    </item>
+    
+    <item>
+      <title>A basic guide to using NLP for corpus analysis with R (Part 1): Installing Python, spacy, and cleanNLP</title>
+      <link>https://susie-kim.github.io/posts/2018-01-09-guide-cnlp-part1/</link>
+      <pubDate>Tue, 09 Jan 2018 16:10:46 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2018-01-09-guide-cnlp-part1/</guid>
+      <description>1 . Installing Python 1.1 . Download Python 1.2 . Install Python 1.3 . Test if Python works 2 . Installing NLP backend: spaCy 2.1 . Install spacy 2.2 . Download language models 3 . Getting ready with RStudio 3.1 . Install all requirements 3.2 . Processing a text string This is Part 1 of a basic guide for setting up and using a natural language processing (NLP) tool with R.</description>
+    </item>
+    
+  </channel>
+</rss>

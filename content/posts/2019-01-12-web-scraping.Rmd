@@ -1,0 +1,266 @@
+---
+title: "Web Scraping with R: A Great Resource for Language Learning and Teaching"
+author: Susie Kim
+date: '2019-01-12T12:30:00-05:00'
+tags: 
+- R
+- corpus analysis
+- text analysis
+- web scraping
+- language learning
+- language teaching
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+# . Introduction
+
+Recently, I helped a colleague scrape text from Wikipedia for a class project. If I didn't know any [web scraping](https://en.wikipedia.org/wiki/Web_scraping) technique, I would have had to copy and paste an infinite number of times to gather all the Wiki entries I needed. This would also have required going through at least four steps for each entry: 1) searching the page, 2) copying the content, 3) pasting it into a word processor, and 4) removing unwanted parts such as pictures. If I did this more than 5 times, I would already start to feel fatigued. 
+
+Web scraping can provide language data that can be used for a myriad of purposes in this world. For second language learning and teaching, it can be used to create a relatively large corpora from which we can generate lists of vocabulary, collocations, and/or lexical bundles. Such data would be particularly useful for English for Specific Purposes (ESP), English for Academic Purposes (EAP), and genre-based approaches. 
+
+In this post, I introduce how to scrape texts from the web along with (very skimpy) ideas for how to use the corpus for teaching. I have three examples. The first one is the longest because I explain how to inspect HTML information on websites.
+
+## . Tools Needed
+
+The R package required for web scraping is `rvest`. I'll also use the Google Chrome web browser to view page sources and inspect elements. However, Firefox and Edge also have this feature.
+
+# . Example 1: Scraping Webpages
+
+## . Wikipedia entries
+I was helping my colleague with scraping Wikipedia entries of American actors and actresses, with which he ultimatley aimed to create a corpus and extract lexical bundles. To collect a decent amount of language that is necessary for generating a list of lexical bundles, we scraped 210 articles which resulted in about a million word corpus. 
+
+First, I asked my colleague to make a list of actors that he wanted, because he only wanted to include well-known actors to ensure their wiki page has enough content and language. For Wikipedia, the web address consists of one fixed part, "https://en.wikipedia.org/wiki/" and another part, which is the name or title of the person/thing/topic. Therefore, I needed a list of names to generate page links and so that I could access each page. The following codes were used to read the list from an Excel file and put together the links. 
+
+```{r message=FALSE}
+library(rvest)
+# Set working directory and read the file with actor list
+# The data must have names that are capitalized (e.g., Brad Pitt)
+df <- readxl::read_excel("Alist.xlsx")
+
+# Create a list of the names: Take the first column and repace space with underscore
+df$list <- gsub("\\s", "_", df[[1]])
+
+# Create a list of web addresses for Wikipedia entries
+df$urls <- paste0("https://en.wikipedia.org/wiki/", df$list)
+```
+
+```{r echo=FALSE}
+head(df, 5)
+```
+
+To extract the exact information you want on a web page, you need to study its HTML structure. This is probably the most time-consuming process. The structures also differ from website to website so my codes won't work as they do here when scraping a different website. Here's a general idea and a brief explanation of how to get what you need. [This document](https://rpubs.com/ryanthomas/webscraping-with-rvest) I found online also has a good description of how web scraping with R works.
+
+First, go to the web page that exemplifies your target content. With this example, I'll go to the Wikipedia page of Matthew McConaughey to study the structure of a Wikipedia entry. 
+
+If you're using Google Chrome, right-click on your mouse and click on 'Inspect' (Keyboard shortcut: `Ctrl + Shift + I`). This will open up a new pane on the right side of your screen with three sub-panes (Firefox has the same panes, just horizontally organized). Click on the small icon (a square with a pointer) at the top left corner of the newly opened pane to select the element from the web page (Keyboard shortcut: `Ctrl + Shift + C`). Once this icon is activated, move your mouse around on the content page until you see that what you want to scrape is highlighted in blue (see the picture below). Left-click on your mouse, and this will also highlight the corresponding line on the inspector pane on the right side. 
+![](web-scraping-1.png)
+
+Expand the line by clicking the small arrow (at the start of the line) and view the nested structure. In this case, I don't want the little line right under title of the article that says "From Wikipedia, the free encyclopedia". What I want is the body of the content, and this is under `\<div id="mw-content-text" lang="en" ...\>`. 
+
+What I find easier to look at is the texts that appear at the bottom of the top sub-pane. This lists the structure of the target content. Starting on the left side, from `html`, `body`, `div#...`, down to where you're currently at. 
+
+I took the string `#mw-content-text`, which is the "ID" of the section that I want. The next command reads the html file from the web and extracts the target node. Don't forget to include the hashtag, which indicates that it's an ID (as in `\<div ID=\>`).
+
+```{r}
+read_html("https://en.wikipedia.org/wiki/Matthew_McConaughey") %>% 
+    html_nodes("#mw-content-text")
+```
+
+If successful, it should have an output. If it says `xml_nodeset (0)`, then it means nothing has been grabbed. 
+
+Moving on, under this node `mw-content-text`, I only want the text: not the pictures, not the table of contents, nor the information in the box. When a web page consists of paragraphs, texts usually appear after a \<p\>, which denotes a new paragraph. If you're not sure, click on the little selector icon and hover over a paragraph to see what the dark bubble says (which should say "`p`" as in the picture below), or what becomes highlighed on the inspector pane (`\<p\>...\</p\>`). So I pipeline another code to get at this node:
+
+```{r}
+read_html("https://en.wikipedia.org/wiki/Matthew_McConaughey") %>% 
+    html_nodes("#mw-content-text") %>% html_nodes("p")
+```
+
+![](web-scraping-2.png)
+
+Now we have captured all nodes relevant to the information we want. However, the codes here so far only read the meta-language of the HTML and not the actual text we want to grab. To extract the text, add `html_text()` to the pipeline.
+
+```{r}
+read_html("https://en.wikipedia.org/wiki/Matthew_McConaughey") %>% 
+    html_nodes("#mw-content-text") %>% html_nodes("p") %>% html_text()
+```
+
+You can see that this code has extracted the 25 paragraphs that appear in Matthew McConaughey's wiki.
+
+![](web-scraping-3.png)
+
+A shortcut/alternative is to use XPath. You can obtain the XPath by selecting the line that corresponds to the target element on the inspector pane, then by right clicking the mouse to choose: Copy - Copy XPath. 
+
+The XPath I got here, `//*[@id="mw-content-text"]/div/p`, specifies that I want all texts under the node `\<p\>` nested under this particular `\<div\>` node.
+
+```{r}
+read_html("https://en.wikipedia.org/wiki/Matthew_McConaughey") %>% 
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/p') %>% 
+    html_text()
+```
+
+The results are same as with the first method. Because the text from each paragraph becomes one element in R (25 paragraphs mean 25 elements), I'll collapse all paragraphs in my final code with the `paste` function.
+
+```{r eval=FALSE}
+# Loop through the names and collect texts
+for (n in 1:nrow(df)) {
+    # scrape text from the content body
+    df$text[[n]] <- read_html(df$urls[[n]]) %>% 
+        html_nodes(xpath = '//*[@id="mw-content-text"]/div/p') %>% 
+        html_text() %>% 
+        paste0(collapse = "")
+    # print progress to detect if and where a problem occurs
+    print(paste(df$list[[n]], "- Complete")) 
+}
+
+# Clean the text by removing the footnote numbers
+df$text <- gsub("\\[\\d{1,3}\\]", " ", df$text)
+```
+
+Because my colleague wanted to use AntConc in the next step, I saved each text as its own text file.
+
+```{r eval=FALSE}
+# Save the text for each actor in .txt format. Use the name as filename.
+for (m in 1:length(df$text)) {
+    write(df$text[[m]], paste0(df$list[[m]], ".txt"))
+}
+```
+
+## . More ideas
+
+There has been a lot of research to create vocabulary or phrase lists for a specific genre or sub-genre (often relevant to academic writing). The more interesting and perhaps more useful method for teaching would be putting such word lists into context to show what sorts of words are used where in a written text in what genre. In other words, what's the language that is typically used in a specific context? For instance, Cortes (2013)[^1] analyzed lexical bundles that are frequently used to serve certain purposes in the introduction section of research articles (as implied in the title, "*The purpose of this study is to*: Connecting lexical bundles and moves in research article introductions"). 
+
+In the scraping process above, I collapsed all paragraphs together but texts can be categorized differently to find which words or collocations are frequently used in the first paragraph, in the last paragraph, etc., so that learners can make connections between language and its function. When teaching or giving a task that requires writing a movie review, reviews written by real people can be scraped from the Internet and be analyzed as learning materials. Such summary of large, linguistic data will allow learners to see the relationship between linguistic choice and the context (e.g., register, genre, task). 
+
+
+# . Example 2: Scraping Blogs
+
+Blogs on specialized topics are great sources of language data. If the posts are well-categorized and/or tagged, you can easily navigate to a page where the posts of your interest are listed, and you can go from there for web scraping.
+
+## . The Big Bang Theory transcripts
+In this example, I scrape the transcripts for the TV series, the *Big Bang Theory*.
+
+This [blog](https://bigbangtrans.wordpress.com) has all transcripts from 10 seasons. In the previous example, someone had to manually create a list to generate URLs for web pages. This time, the URLs themselves will be extracted from a web page. I went through a process of inspecting the websites to first extract the links to each page that contains the transcript, then extracting the text from each page. This blog conveniently lists links to all posts on the widget that appears on your right. 
+
+![](web-scraping-4.png)
+
+The current example is what usually would be the case with the URLs that exist as meta-data. I extracted the attribute \<a href\> by using `html_attr("href")`.
+
+```{r}
+bbt_url <- "https://bigbangtrans.wordpress.com"
+bbt_html <- read_html(bbt_url)
+
+bbt_links <- bbt_html %>% 
+    html_nodes(xpath = '//*[@id="pages-2"]/ul/li/a') %>% 
+    html_attr("href")
+```
+
+Because the list of the links includes an introduction post that I don't need, I excluded the first link when I saved the links as a data frame. Also, I changed the `link` column to character strings.
+
+```{r}
+bbt_table <- data.frame(link = bbt_links[-1])
+bbt_table$link <- as.character(bbt_table$link)
+```
+
+I will experiment with the first 5 episodes. Note that I'm switching between HTML and XPath to give some different examples.
+
+```{r message=FALSE}
+bbt_ex <- dplyr::slice(bbt_table, 1:5)
+
+for (n in 1:nrow(bbt_ex)) {
+    bbt_ex$text[[n]] <- read_html(bbt_ex$link[[n]]) %>% 
+        html_nodes(".entrytext") %>% 
+        html_nodes("p") %>% 
+        html_text() %>% 
+        paste0(collapse = "")
+}
+```
+
+## . More ideas
+What I like about this example is that, although scripted, it provides spoken language data which is rarer than written. Thinking in terms of gathering spoken language (or at least something close), you can try finding transcripts of TV shows, movies, news, and other broadcasts. 
+
+The Big Bang Theory corpus created here could be used to identify which episode has the target grammar or vocabulary you want to teach. For example, if I want to show a clip that has one or more instances of using a specific idiom or a phrasal verb, I can use this corpus I've built to locate which episode has that particular phrase - which can be a huge time saver.
+
+Further linguistic analysis could provide a useful list of collocations, phrasal verbs, or other expressions, as well as how they are used in conversations. After coming up with a list of collcations, (either with software such as AntConc or methods such as [this n-gram analysis](https://susie-kim.github.io/post/2019-01-01-new-corenlp/#example-text-analysis-creating-bigrams-and-trigrams)), you can give the list to learners and ask them to make a conversation using these words. After that, you can watch how these expressions are actually used in the TV show.
+
+With further text processing, corpora of different characters from the show can also be built. The Big Bang Theory is probably too difficult for learners with all the technical jargon, but if your students regularly watch a TV show, such as the timeless classic, *Friends*, you can give them a list of words and phrases that a character often uses and have students engage in reconstructing scripts and role playing. 
+
+# . Example 3: Scraping Online Newspapers
+
+In this last example, I scrape recent articles from the [Social Issues Opinion](https://www.cnn.com/specials/opinion/opinion-social-issues) section on *CNN*. Your result will be different from what appears on this post because this list of articles is constantly being updated. Be sure to comply with the [terms of use](https://www.cnn.com/terms) and not violate their copyright.
+
+## . Social Commentary from CNN
+
+This example similar to the previous example, but I spent more time inspecting the page elements  in order to figure out how to pull the links to each article and the main texts. Here's how it went down: 
+
+```{r}
+sc_url <- "https://www.cnn.com/specials/opinion/opinion-social-issues"
+sc_html <- read_html(sc_url)
+
+sc_list <- sc_html %>% 
+    html_nodes("article") 
+```
+
+The `article` node contains the xml information of each article. Two hundred article information will be collected from this page. 
+
+```{r}
+sc_list[[1]]
+```
+
+I needed to extract only the link to the article. Upon inspection, I found that `data-vr-contentbox` was the attribute that included the link. I created a data frame with the links so I can store only the URL there. Note that this `link` column needs to be character (rather than factor) to avoid error in a later stage.
+
+```{r}
+# Remove unnecessary information
+sc_links <- sc_list %>% xml_attr("data-vr-contentbox")
+sc_table <- data.frame(link = sc_links)
+sc_table$link <- as.character(sc_table$link)
+```
+
+In order to grab texts from these articles, I needed to view one or multiple articles and find out how to extract the text from the it. I looped through ten articles as an example here. 
+
+I ran into a problem where the URL format varied depending on the type of the article, namely, the interactive articles. The links for these articles began with "https://www.cnn.com" whereas ordinary articles did not. I removed the interactive ones by excluding links that began with "https". Then I added a column which included the actual web address.
+
+```{r}
+library(dplyr); library(stringr)
+sc_ex <- sc_table %>% filter(!str_starts(link, "https")) %>% slice(1:10) %>% mutate(add = paste0("https://www.cnn.com", link))
+
+for (n in 1:nrow(sc_ex)) {
+
+    # get the title
+    sc_ex$title[[n]] <- read_html(sc_ex$add[[n]]) %>% 
+        html_nodes("h1") %>% 
+        html_text()
+    
+    sc_ex$text[[n]] <- read_html(sc_ex$add[[n]]) %>% 
+        html_nodes(".zn-body__paragraph") %>% 
+        html_text() %>% 
+      paste0(collapse = "")
+}
+```
+
+The title of the article appeared under the node `\<h1\>` and the article was under `\<div id="article-body"\>`. I used this information to store the title and content of each article. Each article contains about 1,000 words and now I have a 200,000-word corpus.
+
+## . More ideas
+News opinion pieces can be thought of as a type of argumentative writing, and so you may want to conduct a move analysis combined with collocations. You can use sites such as Google News, to select a specific category and scrape news on that specific topic to create a vocabulary/phrase list for English for Specific Purposes. This will assist learners with learning frequently used expressions which they are likely to encounter when studying or working. 
+
+# . Summary
+- Reasons to utilize web scraping for language teaching
+    + You can instantly collect a lot of language
+    + You can provide learners with language that is frequently used in real life
+
+- For meaningful teaching (beyond offering a vocabulary list): 
+    + Come up with a topic or genre that is useful for learners
+    + Use the scraped data to show how language is used for what purposes
+    + Have students reconstruct the genre or conversation using the word list and make comparisonss
+
+* This post was inspired by the course, LLT 809: Teaching Second Language Reading and Writing (Instructor: Dr. Charlene Polio). Please feel free to share your thoughts! 
+
+* Codes were last updated on 09/25/2019.
+
+[^1]: Cortes, V. (2013). The purpose of this study is to: Connecting lexical bundles
+and moves in research article introductions. *Journal of English for Academic Purposes*, *12*, 33-43. http://dx.doi.org/10.1016/j.jeap.2012.11.002.

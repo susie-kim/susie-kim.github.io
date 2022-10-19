@@ -1,0 +1,1110 @@
+---
+title: "Comparing tools for obtaining word token and type"
+author: Susie Kim
+date: '2018-12-25T20:00:00-05:00'
+tags:
+- corpus
+- token
+- type
+- R
+- corpus analysis
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+
+<div id="TOC">
+<ul>
+<li><a href="#text-files"><span class="toc-section-number">1</span> . Text files</a></li>
+<li><a href="#working-with-r-packages"><span class="toc-section-number">2</span> . Working with R packages</a><ul>
+<li><a href="#quanteda"><span class="toc-section-number">2.1</span> . Quanteda</a></li>
+<li><a href="#tidytext"><span class="toc-section-number">2.2</span> . Tidytext</a></li>
+</ul></li>
+<li><a href="#results-from-natural-language-processing-tools"><span class="toc-section-number">3</span> . Results from Natural Language Processing Tools</a><ul>
+<li><a href="#spacy"><span class="toc-section-number">3.1</span> . spacy</a></li>
+<li><a href="#stanford-corenlp"><span class="toc-section-number">3.2</span> . Stanford CoreNLP</a></li>
+</ul></li>
+<li><a href="#comparisons"><span class="toc-section-number">4</span> . Comparisons</a><ul>
+<li><a href="#tokens"><span class="toc-section-number">4.1</span> . Tokens</a></li>
+<li><a href="#types"><span class="toc-section-number">4.2</span> . Types</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>When analyzing texts in any context, the most basic linguistic characteristics of the corpus (i.e., texts) to describe are word tokens (i.e., the number of words) and types (i.e., the number of distinct words). These numbers, however, will be slightly different depending on which software you use. I wanted to compare different options for obtaining the number of tokens and types.</p>
+<p>In this post, I use the R packages <code>quanteda</code>, <code>tidytext</code> + <code>textstem</code>, the NLP engines that I have introduced in this blog (spacy and Stanford CoreNLP), and popular software, AntConc and Wordsmith (version 7), for such comparison.</p>
+<div id="text-files" class="section level1">
+<h1><span class="header-section-number">1</span> . Text files</h1>
+<p>I have randomly chosen five essays from <a href="https://uclouvain.be/en/research-institutes/ilc/cecl/locness.html">LOCNESS</a> to use in as examples.</p>
+<p>I prefer using the package <code>readtext</code> to build a raw corpus. It will create a data table with the document ID and text in two separate columns for each file. I named the corpus object <code>txt</code>.</p>
+<pre class="r"><code>library(readtext)
+txt &lt;- readtext(&quot;corpus/*.txt&quot;)
+head(txt)</code></pre>
+<pre><code>## readtext object consisting of 5 documents and 0 docvars.
+## # Description: df[,2] [5 x 2]
+##   doc_id      text               
+## * &lt;chr&gt;       &lt;chr&gt;              
+## 1 text_01.txt &quot;\&quot;Two men, o\&quot;...&quot;
+## 2 text_02.txt &quot;\&quot;I am not a\&quot;...&quot;
+## 3 text_03.txt &quot;\&quot;Over the p\&quot;...&quot;
+## 4 text_04.txt &quot;\&quot;There is a\&quot;...&quot;
+## 5 text_05.txt &quot;\&quot;Boxing is \&quot;...&quot;</code></pre>
+</div>
+<div id="working-with-r-packages" class="section level1">
+<h1><span class="header-section-number">2</span> . Working with R packages</h1>
+<div id="quanteda" class="section level2">
+<h2><span class="header-section-number">2.1</span> . Quanteda</h2>
+<p>The package <a href="https://github.com/quanteda/quanteda"><code>quanteda</code></a>, which stands for quantitative analysis of textual data, provides simple functions that compute the number of tokens, <code>ntoken()</code>, and types <code>ntype()</code>. This seems to be something quick and dirty.</p>
+<pre class="r"><code>library(quanteda)
+
+ex &lt;- &quot;This is an example. Here is another example sentence, providing a couple short sentences.&quot;
+
+ntoken(ex)</code></pre>
+<pre><code>## text1 
+##    17</code></pre>
+<pre class="r"><code>ntype(tolower(ex))</code></pre>
+<pre><code>## text1 
+##    14</code></pre>
+<p><code>ntoken</code> says there are 17 tokens, which suggests that each word is counted including puncuation marks. <code>ntype</code> says there are 14 types. I assume that these are: “this”, “is” (2), “an”, “example” (2), “.” (2), “here”, “another”, “sentence”, “,”, “providing”, “a”, “couple”, “short”, “sentences”. In other words, the <code>ntype</code> function only considers the same exact words as one type. Therefore, the pairs “a” and “an” and “sentence” and “sentences”, appear as different two different types. This actually doesn’t agree with the definition of word type.</p>
+<p>I already have the corpus <code>txt</code>, but I can feed this into <code>quanteda</code>’s <code>corpus()</code> function to build its version of corpus. Calling summary, I can see the types and tokens in each text. The Type column must be computed differently through this process than through the <code>ntype()</code> function, as I see different numbers. However, I’m not sure what causes such difference.</p>
+<pre class="r"><code>(quant_n &lt;- summary(corpus(txt)))</code></pre>
+<pre><code>## Corpus consisting of 5 documents:
+## 
+##         Text Types Tokens Sentences
+##  text_01.txt   167    316        10
+##  text_02.txt   276    517        21
+##  text_03.txt   260    685        22
+##  text_04.txt   205    390        16
+##  text_05.txt   183    372        13
+## 
+## Source: D:/GitHub/susie-kim.github.io/content/post/* on x86-64 by susie
+## Created: Sun Nov 03 12:43:13 2019
+## Notes:</code></pre>
+<p>The differences range from 5 to 12. I will append this result as <code>Type_word</code> to the data table for later comparisons.</p>
+<pre class="r"><code>ntype(tolower(txt$text))</code></pre>
+<pre><code>## text1 text2 text3 text4 text5 
+##   162   265   248   199   177</code></pre>
+<p>This is the summary of results from using the <code>quanteda</code> package.</p>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+Tokens
+</th>
+<th style="text-align:right;">
+Types
+</th>
+<th style="text-align:right;">
+Types_word
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_01.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+316
+</td>
+<td style="text-align:right;width: 10em; ">
+167
+</td>
+<td style="text-align:right;width: 10em; ">
+162
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_02.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+517
+</td>
+<td style="text-align:right;width: 10em; ">
+276
+</td>
+<td style="text-align:right;width: 10em; ">
+265
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_03.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+685
+</td>
+<td style="text-align:right;width: 10em; ">
+260
+</td>
+<td style="text-align:right;width: 10em; ">
+248
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_04.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+390
+</td>
+<td style="text-align:right;width: 10em; ">
+205
+</td>
+<td style="text-align:right;width: 10em; ">
+199
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_05.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+372
+</td>
+<td style="text-align:right;width: 10em; ">
+183
+</td>
+<td style="text-align:right;width: 10em; ">
+177
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tidytext" class="section level2">
+<h2><span class="header-section-number">2.2</span> . Tidytext</h2>
+<p>The package <a href="https://cran.r-project.org/web/packages/tidytext/vignettes/tidytext.html"><code>tidytext</code></a> includes a tokenizing function, <code>unnest_tokens()</code>. It automatically removes punctuation marks. Therefore, the result will defintiely be different from the previous analysis.</p>
+<p>I don’t think this package includes any lemmatizing functions so I turn to the <code>textstem</code> package for this process. <code>lemmatize_words()</code> litterally lemmatizes words, meaning that it returns the base form of each word. For instance, the word “men” is noted as “man” in the lemma column below.</p>
+<pre class="r"><code>library(tidytext); library(textstem); library(dplyr)
+
+tidy_text &lt;- txt %&gt;% 
+    unnest_tokens(word, text) %&gt;% 
+    mutate(lemma = lemmatize_words(word))
+
+head(tidy_text, 10)</code></pre>
+<pre><code>##         doc_id     word    lemma
+## 1  text_01.txt      two      two
+## 2  text_01.txt      men      man
+## 3  text_01.txt      one      one
+## 4  text_01.txt     ring     ring
+## 5  text_01.txt     only     only
+## 6  text_01.txt      one      one
+## 7  text_01.txt      can      can
+## 8  text_01.txt    leave    leave
+## 9  text_01.txt dramatic dramatic
+## 10 text_01.txt       it       it</code></pre>
+<p>You can see from the code below that <code>Types_word</code> is the number of unique words, and Types_lemma is the number of unique lemmas.</p>
+<pre class="r"><code>tidy_n &lt;- tidy_text %&gt;% 
+    group_by(doc_id) %&gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma))) %&gt;% 
+    rename(id = doc_id)</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+Tokens
+</th>
+<th style="text-align:right;">
+Types_word
+</th>
+<th style="text-align:right;">
+Types_lemma
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_01.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+288
+</td>
+<td style="text-align:right;width: 10em; ">
+155
+</td>
+<td style="text-align:right;width: 10em; ">
+140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_02.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+487
+</td>
+<td style="text-align:right;width: 10em; ">
+260
+</td>
+<td style="text-align:right;width: 10em; ">
+233
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_03.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+623
+</td>
+<td style="text-align:right;width: 10em; ">
+245
+</td>
+<td style="text-align:right;width: 10em; ">
+214
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_04.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+353
+</td>
+<td style="text-align:right;width: 10em; ">
+190
+</td>
+<td style="text-align:right;width: 10em; ">
+175
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_05.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+342
+</td>
+<td style="text-align:right;width: 10em; ">
+173
+</td>
+<td style="text-align:right;width: 10em; ">
+157
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="results-from-natural-language-processing-tools" class="section level1">
+<h1><span class="header-section-number">3</span> . Results from Natural Language Processing Tools</h1>
+<div id="spacy" class="section level2">
+<h2><span class="header-section-number">3.1</span> . spacy</h2>
+<p>For installation, see <a href="/post/2018-01-09-guide-cnlp-part1/">my previous post on the topic</a>.
+I annotate the corpus using the <code>cnlp_annotate</code> function, which will perform tokenization, lemmatization, and tagging for parts-of-speech.</p>
+<pre class="r"><code>library(cleanNLP); library(reticulate)
+
+cnlp_init_spacy(model_name = &quot;en_core_web_lg&quot;)
+cnlp_ann &lt;- cnlp_annotate(txt)
+cnlp_tok &lt;- cnlp_get_token(cnlp_ann)</code></pre>
+<pre class="r"><code>head(cnlp_tok, 10)</code></pre>
+<pre><code>## # A tibble: 10 x 8
+##    id            sid   tid word  lemma upos  pos     cid
+##    &lt;chr&gt;       &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt;
+##  1 text_01.txt     1     1 Two   two   NUM   CD        0
+##  2 text_01.txt     1     2 men   man   NOUN  NNS       4
+##  3 text_01.txt     1     3 ,     ,     PUNCT ,         7
+##  4 text_01.txt     1     4 one   one   NUM   CD        9
+##  5 text_01.txt     1     5 ring  ring  NOUN  NN       13
+##  6 text_01.txt     1     6 ,     ,     PUNCT ,        17
+##  7 text_01.txt     1     7 only  only  ADV   RB       19
+##  8 text_01.txt     1     8 one   one   PRON  PRP      24
+##  9 text_01.txt     1     9 can   can   VERB  MD       28
+## 10 text_01.txt     1    10 leave leave VERB  VB       32</code></pre>
+<p>Here is the result from this data. I’ve included the number of unique words, which would presumably be equivalent to <code>quanteda</code>’s <code>ntype</code> function.</p>
+<pre class="r"><code>cnlp_n &lt;- cnlp_tok %&gt;% 
+    group_by(id) %&gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+Tokens
+</th>
+<th style="text-align:right;">
+Types_word
+</th>
+<th style="text-align:right;">
+Types_lemma
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_01.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+317
+</td>
+<td style="text-align:right;width: 10em; ">
+167
+</td>
+<td style="text-align:right;width: 10em; ">
+145
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_02.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+525
+</td>
+<td style="text-align:right;width: 10em; ">
+277
+</td>
+<td style="text-align:right;width: 10em; ">
+237
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_03.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+685
+</td>
+<td style="text-align:right;width: 10em; ">
+260
+</td>
+<td style="text-align:right;width: 10em; ">
+221
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_04.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+390
+</td>
+<td style="text-align:right;width: 10em; ">
+205
+</td>
+<td style="text-align:right;width: 10em; ">
+182
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_05.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+375
+</td>
+<td style="text-align:right;width: 10em; ">
+185
+</td>
+<td style="text-align:right;width: 10em; ">
+160
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="stanford-corenlp" class="section level2">
+<h2><span class="header-section-number">3.2</span> . Stanford CoreNLP</h2>
+<p>To exercise this option, I utilzed the Stanford CoreNLP tool, the process of which is illustrated in <a href="/post/2018-04-06-guide-corenlp/">this post</a>. I have already processed the tfiles and only present the results here. The types of output I have genereated are the same as with the previous one.</p>
+<pre class="r"><code>head(st_tok, 10)</code></pre>
+<pre><code>##             id  word lemma CharacterOffsetBegin CharacterOffsetEnd POS
+## 1  text_01.txt   Two   two                    0                  3  CD
+## 2  text_01.txt   men   man                    4                  7 NNS
+## 3  text_01.txt     ,     ,                    7                  8   ,
+## 4  text_01.txt   one   one                    9                 12  CD
+## 5  text_01.txt  ring  ring                   13                 17  NN
+## 6  text_01.txt     ,     ,                   17                 18   ,
+## 7  text_01.txt  only  only                   19                 23  RB
+## 8  text_01.txt   one   one                   24                 27  CD
+## 9  text_01.txt   can   can                   28                 31  MD
+## 10 text_01.txt leave leave                   32                 37  VB</code></pre>
+<pre class="r"><code>snlp_n &lt;- st_tok %&gt;% group_by(id) %&gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+Tokens
+</th>
+<th style="text-align:right;">
+Types_word
+</th>
+<th style="text-align:right;">
+Types_lemma
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_01.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+317
+</td>
+<td style="text-align:right;width: 10em; ">
+168
+</td>
+<td style="text-align:right;width: 10em; ">
+147
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_02.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+521
+</td>
+<td style="text-align:right;width: 10em; ">
+276
+</td>
+<td style="text-align:right;width: 10em; ">
+243
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_03.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+680
+</td>
+<td style="text-align:right;width: 10em; ">
+259
+</td>
+<td style="text-align:right;width: 10em; ">
+222
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_04.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+390
+</td>
+<td style="text-align:right;width: 10em; ">
+207
+</td>
+<td style="text-align:right;width: 10em; ">
+187
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_05.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+373
+</td>
+<td style="text-align:right;width: 10em; ">
+184
+</td>
+<td style="text-align:right;width: 10em; ">
+161
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="comparisons" class="section level1">
+<h1><span class="header-section-number">4</span> . Comparisons</h1>
+<p>So far, I have obtained word tokens and types using four different methods. I also ran the texts in AntConc and Wordsmith, which are not described here.</p>
+<div id="tokens" class="section level2">
+<h2><span class="header-section-number">4.1</span> . Tokens</h2>
+<p>Let’s look at the number of tokens that the different methods of analysis/software produced.</p>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+quanteda
+</th>
+<th style="text-align:right;">
+tidytext
+</th>
+<th style="text-align:right;">
+cnlp
+</th>
+<th style="text-align:right;">
+snlp
+</th>
+<th style="text-align:right;">
+antconc
+</th>
+<th style="text-align:right;">
+wordsmith
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_01.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+316
+</td>
+<td style="text-align:right;width: 10em; ">
+288
+</td>
+<td style="text-align:right;width: 10em; ">
+317
+</td>
+<td style="text-align:right;width: 10em; ">
+317
+</td>
+<td style="text-align:right;width: 10em; ">
+289
+</td>
+<td style="text-align:right;width: 10em; ">
+288
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_02.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+517
+</td>
+<td style="text-align:right;width: 10em; ">
+487
+</td>
+<td style="text-align:right;width: 10em; ">
+525
+</td>
+<td style="text-align:right;width: 10em; ">
+521
+</td>
+<td style="text-align:right;width: 10em; ">
+490
+</td>
+<td style="text-align:right;width: 10em; ">
+487
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_03.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+685
+</td>
+<td style="text-align:right;width: 10em; ">
+623
+</td>
+<td style="text-align:right;width: 10em; ">
+685
+</td>
+<td style="text-align:right;width: 10em; ">
+680
+</td>
+<td style="text-align:right;width: 10em; ">
+623
+</td>
+<td style="text-align:right;width: 10em; ">
+623
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_04.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+390
+</td>
+<td style="text-align:right;width: 10em; ">
+353
+</td>
+<td style="text-align:right;width: 10em; ">
+390
+</td>
+<td style="text-align:right;width: 10em; ">
+390
+</td>
+<td style="text-align:right;width: 10em; ">
+351
+</td>
+<td style="text-align:right;width: 10em; ">
+353
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_05.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+372
+</td>
+<td style="text-align:right;width: 10em; ">
+342
+</td>
+<td style="text-align:right;width: 10em; ">
+375
+</td>
+<td style="text-align:right;width: 10em; ">
+373
+</td>
+<td style="text-align:right;width: 10em; ">
+343
+</td>
+<td style="text-align:right;width: 10em; ">
+341
+</td>
+</tr>
+</tbody>
+</table>
+<p>The fact that the numbers are similar among tidytext, antconc, and wordsmith suggests that AntConc and Wordsmith do not include punctuation in their word count, which makes sense. cnlp and snlp currently include punctuation so I will remove them and recalculate the tokens and types.</p>
+<pre class="r"><code>cnlp_n &lt;- cnlp_tok %&gt;% filter(!upos %in% c(&quot;PUNCT&quot;, &quot;SYM&quot;, &quot;NUM&quot;)) %&gt;% 
+    group_by(id) %&gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))
+
+#create a list of POS tags to exclude 
+except &lt;- c(&quot;,&quot;, &quot;.&quot;, &quot;``&quot;, &quot;&#39;&#39;&quot;, &quot;:&quot;, &quot;#&quot;, &quot;$&quot;, &quot;-LRB-&quot;, &quot;-RRB-&quot;, &quot;CD&quot;)
+
+snlp_n &lt;- st_tok %&gt;% filter(!POS  %in% except) %&gt;% 
+    group_by(id) %&gt;% 
+    summarize(Tokens = n(), 
+              Types_word = length(unique(word)), 
+              Types_lemma = length(unique(lemma)))</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+quanteda
+</th>
+<th style="text-align:right;">
+tidytext
+</th>
+<th style="text-align:right;">
+cnlp
+</th>
+<th style="text-align:right;">
+snlp
+</th>
+<th style="text-align:right;">
+antconc
+</th>
+<th style="text-align:right;">
+wordsmith
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_01.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+316
+</td>
+<td style="text-align:right;width: 10em; ">
+288
+</td>
+<td style="text-align:right;width: 10em; ">
+286
+</td>
+<td style="text-align:right;width: 10em; ">
+285
+</td>
+<td style="text-align:right;width: 10em; ">
+289
+</td>
+<td style="text-align:right;width: 10em; ">
+288
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_02.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+517
+</td>
+<td style="text-align:right;width: 10em; ">
+487
+</td>
+<td style="text-align:right;width: 10em; ">
+487
+</td>
+<td style="text-align:right;width: 10em; ">
+483
+</td>
+<td style="text-align:right;width: 10em; ">
+490
+</td>
+<td style="text-align:right;width: 10em; ">
+487
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_03.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+685
+</td>
+<td style="text-align:right;width: 10em; ">
+623
+</td>
+<td style="text-align:right;width: 10em; ">
+620
+</td>
+<td style="text-align:right;width: 10em; ">
+619
+</td>
+<td style="text-align:right;width: 10em; ">
+623
+</td>
+<td style="text-align:right;width: 10em; ">
+623
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_04.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+390
+</td>
+<td style="text-align:right;width: 10em; ">
+353
+</td>
+<td style="text-align:right;width: 10em; ">
+349
+</td>
+<td style="text-align:right;width: 10em; ">
+349
+</td>
+<td style="text-align:right;width: 10em; ">
+351
+</td>
+<td style="text-align:right;width: 10em; ">
+353
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_05.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+372
+</td>
+<td style="text-align:right;width: 10em; ">
+342
+</td>
+<td style="text-align:right;width: 10em; ">
+337
+</td>
+<td style="text-align:right;width: 10em; ">
+336
+</td>
+<td style="text-align:right;width: 10em; ">
+343
+</td>
+<td style="text-align:right;width: 10em; ">
+341
+</td>
+</tr>
+</tbody>
+</table>
+<p>Now the results look very similar except for those from <code>quanteda</code>. The differences could be resulting from how contractions, numbers, and non-characters are accounted for. These numbers are also slightly different from the word count from Microsoft Word, but close enough.</p>
+</div>
+<div id="types" class="section level2">
+<h2><span class="header-section-number">4.2</span> . Types</h2>
+<p>The number of unique words is interesting because even though I have removed punctuation marks, there are some differences between tidytext and cnlp/snlp:</p>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+quanteda
+</th>
+<th style="text-align:right;">
+tidytext
+</th>
+<th style="text-align:right;">
+cnlp
+</th>
+<th style="text-align:right;">
+snlp
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_01.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+162
+</td>
+<td style="text-align:right;width: 10em; ">
+155
+</td>
+<td style="text-align:right;width: 10em; ">
+159
+</td>
+<td style="text-align:right;width: 10em; ">
+158
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_02.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+265
+</td>
+<td style="text-align:right;width: 10em; ">
+260
+</td>
+<td style="text-align:right;width: 10em; ">
+267
+</td>
+<td style="text-align:right;width: 10em; ">
+265
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_03.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+248
+</td>
+<td style="text-align:right;width: 10em; ">
+245
+</td>
+<td style="text-align:right;width: 10em; ">
+254
+</td>
+<td style="text-align:right;width: 10em; ">
+254
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_04.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+199
+</td>
+<td style="text-align:right;width: 10em; ">
+190
+</td>
+<td style="text-align:right;width: 10em; ">
+193
+</td>
+<td style="text-align:right;width: 10em; ">
+193
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_05.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+177
+</td>
+<td style="text-align:right;width: 10em; ">
+173
+</td>
+<td style="text-align:right;width: 10em; ">
+175
+</td>
+<td style="text-align:right;width: 10em; ">
+174
+</td>
+</tr>
+</tbody>
+</table>
+<p>Next, I compared the unique lemma types. Right off the bat, quanteda’s type is visibly deviant from others so I would not trust that. There are two patterns: numbers obtained from AntConc and Wordsmith are very similar, and the numbers from tidytext, cnlp (spacy), and snlp (Stanford CoreNLP) are very close to one another. The numbers of these two groups are also different enough to assume that the number of unique lemma is not how word type is computed in conventional software.</p>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+id
+</th>
+<th style="text-align:right;">
+quanteda
+</th>
+<th style="text-align:right;">
+tidytext
+</th>
+<th style="text-align:right;">
+cnlp
+</th>
+<th style="text-align:right;">
+snlp
+</th>
+<th style="text-align:right;">
+antconc
+</th>
+<th style="text-align:right;">
+wordsmith
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_01.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+167
+</td>
+<td style="text-align:right;width: 10em; ">
+140
+</td>
+<td style="text-align:right;width: 10em; ">
+137
+</td>
+<td style="text-align:right;width: 10em; ">
+137
+</td>
+<td style="text-align:right;width: 10em; ">
+156
+</td>
+<td style="text-align:right;width: 10em; ">
+155
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_02.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+276
+</td>
+<td style="text-align:right;width: 10em; ">
+233
+</td>
+<td style="text-align:right;width: 10em; ">
+227
+</td>
+<td style="text-align:right;width: 10em; ">
+231
+</td>
+<td style="text-align:right;width: 10em; ">
+261
+</td>
+<td style="text-align:right;width: 10em; ">
+260
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_03.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+260
+</td>
+<td style="text-align:right;width: 10em; ">
+214
+</td>
+<td style="text-align:right;width: 10em; ">
+215
+</td>
+<td style="text-align:right;width: 10em; ">
+217
+</td>
+<td style="text-align:right;width: 10em; ">
+245
+</td>
+<td style="text-align:right;width: 10em; ">
+245
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_04.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+205
+</td>
+<td style="text-align:right;width: 10em; ">
+175
+</td>
+<td style="text-align:right;width: 10em; ">
+170
+</td>
+<td style="text-align:right;width: 10em; ">
+173
+</td>
+<td style="text-align:right;width: 10em; ">
+188
+</td>
+<td style="text-align:right;width: 10em; ">
+189
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 15em; background-color: gray80 !important;">
+text_05.txt
+</td>
+<td style="text-align:right;width: 10em; ">
+183
+</td>
+<td style="text-align:right;width: 10em; ">
+157
+</td>
+<td style="text-align:right;width: 10em; ">
+150
+</td>
+<td style="text-align:right;width: 10em; ">
+151
+</td>
+<td style="text-align:right;width: 10em; ">
+174
+</td>
+<td style="text-align:right;width: 10em; ">
+173
+</td>
+</tr>
+</tbody>
+</table>
+<p>While, conceptually, one might think that the words “sentence” and “sentences” are the same word, tokens include different forms of the same lemma. For instance, “am”, “are”, “was”, “were” are four tokens.</p>
+<p>Tokens from AntConc and Wordsmith are different from the number of unique words shown above, with the results from NLP being slightly larger. I suspect that how numbers and contractions are treated has something to do with this. In NLP, contractions become separated: For example, “shouldn’t” becomes two words, “should” and “not”. In AntConc, “shouldn’t” becomes “shouldn” and “t”. Therefore “should” and “shouldn” are two types. In Wordsmith, “shouldn’t” is just one word.</p>
+<p>Obtaining tokens and types by file has so far been the easiest with Wordsmith, but the software requires purchase. AntConc is freely avilable, but doesn’t analyze text by text when there is a batch of files to process. In my quest to examine and compare how the tokens and types differ by software, I found that using <code>tidytext</code> was the simplest yet reliable in computing word tokens and types.</p>
+</div>
+</div>

@@ -1,0 +1,126 @@
+---
+title: "A basic guide to using NLP for corpus analysis with R (Part 2): Processing
+  text files"
+author: Susie Kim
+date: '2018-01-09T16:20:46-05:00'
+tags:
+- corpus
+- cleannlp
+- spacy
+- nlp
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#processing-text-files"><span class="toc-section-number">1</span> . Processing text files</a><ul>
+<li><a href="#annotate-a-single-text"><span class="toc-section-number">1.1</span> . Annotate a single text</a></li>
+<li><a href="#annotate-all-files-in-a-folder"><span class="toc-section-number">1.2</span> . Annotate all files in a folder</a></li>
+</ul></li>
+<li><a href="#describing-data"><span class="toc-section-number">2</span> . Describing data</a><ul>
+<li><a href="#frequency-tables"><span class="toc-section-number">2.1</span> . Frequency tables</a></li>
+<li><a href="#basic-visualization"><span class="toc-section-number">2.2</span> . Basic visualization</a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>If you’re working with language data, you probably want to process text files rather than strings of words you type on to an R script. Here is how to deal with files. Refer to the previous post for setting the tools up if needed.</p>
+<div id="processing-text-files" class="section level1">
+<h1><span class="header-section-number">1</span> . Processing text files</h1>
+<p>Place all text files that you want to process under the working directory. For example, currently my working directory is set as: <code>C:/my/working/directory/</code>. The .txt files that I will process are in a folder named corpus under this working directory: <code>C:/my/working/directory/corpus</code>. Before proceeding to the next part, load the <code>cleanNLP</code> and <code>reticulate</code> packages, and initiate spaCy by executing <code>cnlp_init_spacy</code> and specifying the language model.</p>
+<pre class="r"><code>library(cleanNLP); library(reticulate)
+cnlp_init_spacy(model_name = &quot;en_core_web_lg&quot;)</code></pre>
+<div id="annotate-a-single-text" class="section level2">
+<h2><span class="header-section-number">1.1</span> . Annotate a single text</h2>
+<p>Let’s say the name of the text file I want to analyze is: text_01.txt, and it’s in the corpus folder right under the working directory. Here is how to process this particular file:</p>
+<pre class="r"><code>#annotate a single file
+single.text &lt;- cnlp_annotate(&quot;corpus/text_01.txt&quot;, as_strings = FALSE)</code></pre>
+<p>It’s as simple as that. Setting <code>as_strings = FALSE</code> lets the annotator know that the path provided is the name of a file, not actual text that’s waiting to be annotated.</p>
+</div>
+<div id="annotate-all-files-in-a-folder" class="section level2">
+<h2><span class="header-section-number">1.2</span> . Annotate all files in a folder</h2>
+<p>Under the folder corpus, I actually have 5 text files and I’d like to process them all. Here is the code that will annotate all these files:</p>
+<pre class="r"><code>#annotate all .txt files in a folder
+all.text &lt;- cnlp_annotate(&quot;corpus/*.txt&quot;, as_strings = FALSE)</code></pre>
+<p>Again, simple! The package has annotated all .txt files under the folder corpus, and the results are saved in a data list named all.text. Something you might want to check at this point is whether all files in your folder are analyzed. Type and execute:</p>
+<pre class="r"><code>cnlp_get_document(all.text)</code></pre>
+<pre><code>##     id                 time version       language                uri
+## 1 doc1 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_01.txt
+## 2 doc2 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_02.txt
+## 3 doc3 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_03.txt
+## 4 doc4 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_04.txt
+## 5 doc5 2019-11-03 17:43:05Z   2.1.8 en_core_web_lg corpus/text_05.txt</code></pre>
+<p>With this example, it shows 5 files that I’ve just processed. If you have more than 10 files, the console pane won’t display the entire list, so you might want to save this data table as a data frame to view it.</p>
+<pre class="r"><code>texts.doc &lt;- cnlp_get_document(all.text)</code></pre>
+<p>Then of course you have all annotated objects that you can retrieve as I have previous talked about:</p>
+<pre class="r"><code>cnlp_get_token(all.text)</code></pre>
+<p>This might just be all you need and you can take it from here to analyze the results with this data with any other software. While we have R running, I will briefly look at some descriptive statistics by using R in the next section.</p>
+</div>
+</div>
+<div id="describing-data" class="section level1">
+<h1><span class="header-section-number">2</span> . Describing data</h1>
+<p>Because we now have the language data under investigation as a data table with words, lemmas, and part-of-speech tags, we can easily describe the this data in frequencies.</p>
+<div id="frequency-tables" class="section level2">
+<h2><span class="header-section-number">2.1</span> . Frequency tables</h2>
+<p>The most interesting part of the data is included in the data frame token, so I’m saving it as a new data frame that I can easily access:</p>
+<pre class="r"><code>t.data &lt;- as.data.frame(all.text$token)</code></pre>
+<p>There are many different ways to get desired information, but I will just stick to using the <code>table</code> function for now. First, to see how many sentences there are in this data, remember that each sentence start is marked as “ROOT” when annotated? I’ll take advantage of that and type in:</p>
+<pre class="r"><code>table(t.data$lemma==&quot;ROOT&quot;)</code></pre>
+<pre><code>## 
+## FALSE  TRUE 
+##  2292    95</code></pre>
+<p>What I see now is a table with labels FALSE and TRUE in the console. The number associated with FALSE is the number of lemmas other than ROOT (hence actual tokens), and the one associated with TRUE is the number of ROOTs, in other words, sentences.</p>
+<p>So here I have 93 sentences.</p>
+<p>Use the following codes to see the frequencies of universal POS:</p>
+<pre class="r"><code>table(t.data$upos)</code></pre>
+<pre><code>## 
+##         ADJ   ADP   ADV   AUX CCONJ   DET  INTJ  NOUN   NUM  PART  PRON 
+##    95   166   238   188     2    83   294     1   473    21    50   106 
+## PROPN PUNCT   SYM  VERB     X 
+##    31   189     3   442     5</code></pre>
+<p>After looking at the results, you will want to get rid of things tagged as “X”, punctuation, spaces, etc. unless you are interested in these features. An easy way to do it is to use the <code>filter</code> function from <code>dplyr</code>. I’m creating a new data frame that includes only the following tags:</p>
+<pre class="r"><code>library(dplyr)
+c.data &lt;- filter(t.data, upos %in% c(&quot;ADJ&quot;, &quot;ADV&quot;, &quot;NOUN&quot;, &quot;VERB&quot;))</code></pre>
+<p>Also, see the list of tags explained <a href="https://spacy.io/api/annotation#pos-tagging">here</a>.</p>
+<p>The new data frame, c.data, probably only includes words that are adjective, adverb, noun, or verb now. Run the codes for the frequency table again, replacing the name of the data frame to see the changes.</p>
+<p>To look at the percentages, use <code>prop.table</code>. For example, see the percentage of each category under universal POS:</p>
+<pre class="r"><code>prop.table(table(c.data$upos))</code></pre>
+<pre><code>## 
+##       ADJ       ADV      NOUN      VERB 
+## 0.1308117 0.1481481 0.3727344 0.3483058</code></pre>
+<p>I will save two frequency tables as data frames, one for lemmas and one for universal POS tags.</p>
+<pre class="r"><code>freq.lem &lt;- data.frame(table(c.data$lemma))
+freq.upos &lt;- data.frame(table(c.data$upos))</code></pre>
+<p>I will also order them by descending frequency using the arrange function in dplyr:</p>
+<pre class="r"><code>freq.lem &lt;- arrange(freq.lem, desc(Freq))
+freq.upos &lt;- arrange(freq.upos, Var1)</code></pre>
+</div>
+<div id="basic-visualization" class="section level2">
+<h2><span class="header-section-number">2.2</span> . Basic visualization</h2>
+<p>I will make just one graph here, using the base graphics included in R. With the frequency data, it would make sense to visualize it as a bar plot.</p>
+<p>Enter the following code. The first argument should be height, or the y-axis value (here, frequencies):</p>
+<pre class="r"><code>barplot(freq.upos$Freq, names.arg = freq.upos$Var1, 
+        xlab = &quot;Universal part-of-speech tags&quot;, ylab = &quot;Observed frequencies&quot;)</code></pre>
+<p><img src="/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>I’ll make a graph of the top ten most frequent lemma with the package <code>ggplot2</code>.</p>
+<pre class="r"><code>top.lem &lt;- subset(freq.lem[1:10,])
+names(top.lem)[1] &lt;- &quot;lemma&quot; #change the variable (column 1) name to &quot;lemma&quot;
+top.lem$lemma &lt;- levels(droplevels(top.lem$lemma)) #remove other lemmas that are listed as factors
+ggplot(top.lem, aes(x = lemma, y = Freq, label = Freq)) + 
+     geom_bar(stat = &quot;identity&quot;, fill = &quot;black&quot;, size = 6) + 
+     geom_text(color = &quot;white&quot;, size = 4, hjust = 1.5) + 
+     labs(x = &quot;Lemma&quot;, y = &quot;Frequency&quot;, title = &quot;Top 10 most frequent lemmas&quot;) + 
+     coord_flip() + theme_minimal()</code></pre>
+<p><img src="/post/2018-01-09-guide-cnlp-part2_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>While the graph looks neat, one thing that bothers me is that spaCy lemmatizes all pronouns as “-PRON-”. This algorithm not only fails to distinguish between the first, second, and third person pronouns but also the hyphens can cause some issues with data handling. I’d run a code to re-lemmatize all pronouns if I wanted to include them in my analysis.</p>
+<p>If you just need to tag texts for concordancing, it is much faster and appropriate to use existing software such as <a href="http://www.laurenceanthony.net/software/tagant/">TagAnt</a> (Anthony, 2015). The tools I’ve used here are effective for data analysis.</p>
+<p>I’ll continue to post, for my own documentation purpose, tools and techniques related to NLP and corpus analysis.</p>
+</div>
+</div>

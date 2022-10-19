@@ -1,0 +1,261 @@
+---
+title: "Using Stanford CoreNLP with R: Bigram and Trigram Analysis"
+author: Susie Kim
+date: '2019-01-01T20:00:00-05:00'
+tags: 
+- R
+- corpus analysis
+- text analysis
+- corenlp
+- tidytext
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+```{r setup, include=FALSE}
+library(knitr); library(kableExtra)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Forget my previous posts on [using the Stanford NLP engine via command](/post/2018-04-06-guide-corenlp) and [retreiving information from XML files](/post/2018-05-04-working-xml) in R.... I've found that everything can be done in RStudio (at least I learned more about how to work with XML in R). This post replaces these two previous ones and adds more example analyses.
+
+# . Preparation
+
+## . Install Java
+
+Download and install, if you don't already have in on your computer, the [Java Development Kit](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). No specific things to look out for during installation.
+
+## . Install cleanNLP and language model
+
+The packages we need in R are `rJava` and `cleanNLP`. Install the developmental version of `cleanNLP` as using the (old) CRAN version won't work properly.
+
+```{r eval=FALSE}
+install.packages("rJava")
+devtools::install_github("statsmaths/cleanNLP")
+```
+
+```{r message=FALSE, warning=FALSE}
+library(cleanNLP)
+library(dplyr)
+```
+
+After loading the package, you can pass an argument to download different language models. The default is set to English so I'm not going to pass anything to the function.
+
+```{r eval=FALSE}
+cnlp_download_corenlp()
+```
+
+This will take some time.
+
+# . Annotation Using Stanford CoreNLP
+
+Now you can itialize the engine to parse your text. The more annotation features you want to utlize, the higher the `anno_level` will be. I usually just go for `anno_level = 0` since I only need tokenization, lemmatization, and part-of-speech tagging. Loading higher level functions takes longer time and can slow down your computer.
+
+```{r message=FALSE, warning=FALSE}
+cnlp_init_corenlp(anno_level = 0)
+```
+
+I'll process the same five texts that I've been using in this blog, five random essays from the LOCNESS.
+The function below can directly call text files from a directory and annotate them.
+
+```{r eval=FALSE}
+anno_text <- cnlp_annotate("corpus/*.txt", as_strings = FALSE)
+```
+
+However, I like building the corpus as its own object to keep using it for various analyses.
+
+```{r}
+#Build the corpus
+txt_cor <- readtext::readtext("corpus/*.txt")
+
+#Save annotations as a table
+txt_ann <- cnlp_annotate(txt_cor)
+txt_tab <- cnlp_get_token(txt_ann)
+
+#Check the first 15 words
+head(txt_tab, 15)
+```
+
+It appears that everything worked well. Next, I'll do some text analysis.
+
+# . Example Text Analysis: Creating Bigrams and Trigrams
+
+## . With tidytext
+
+`tidytext` is a convenient means to perform text analysis. package. Luckily, free resources are available such as [Tidytext](https://www.tidytextmining.com/) that will serve as a structured, useful guide.
+
+```{r message=FALSE, warning=FALSE}
+library(tidytext)
+```
+
+This package includes some functions that are easy to use. We used the corenlp to POS tag the text but if we didn't need that, we could have just tokenized using the `unnest_tokens()` function as I have done in the previous post.
+
+`unnest_token()` first takes the data frame (`txt_cor`). The default setting breaks the text into words (i.e., tokenizes) and creates a new data frame. We need to provide the name of the column for this new data frame (output, I named it `word`) and the column that includes the text data (input, which is `text`).
+
+```{r}
+tidy_tok <- txt_cor %>% unnest_tokens(word, text)
+```
+
+Analyzing n-grams is done with the same function. We can just provide different values to generate a table of n-grams. The first following code takes the corpus and creates a new data frame (`tidy_bi`) with the column `bigram` that contains the bigram. `token = "ngrams"` and `n =2` will extract two-word sequences. The second code will create a list of trigrams.
+
+```{r}
+tidy_bi <- txt_cor %>% unnest_tokens(bigram, text, token = "ngrams", n = 2)
+tidy_tri <- txt_cor %>% unnest_tokens(trigram, text, token = "ngrams", n = 3)
+```
+
+```{r echo=FALSE}
+data.frame(bigram = tidy_bi$bigram[1:10], trigram = tidy_tri$trigram[1:10]) %>% 
+  kable(row.names = FALSE) %>% 
+  kable_styling(bootstrap_options = c("condensed", "responsive"), full_width = TRUE)
+```
+
+Coming from a linguistics perspective, I find it potentially problematic that the bigrams include word chunks that are not meaningful, especially for qualitative text analysis. What I mean is that, for example, the last word of sentence #1 and the first word of sentence #2, "it dramatically", are treated as a bigram. Same applies to words within a sentence that are separated by commas or other punctuation. Consider the first couple sentences from our corpus:
+
+> "Two men, one ring, only one can leave. Dramatic it may be but..."
+
+"men one" is not meaningful, "ring only" is not meaningful. Punctuation serves specific purposes in writing, and ignoring them might fail to deliver meaningful results. Crossing such borders can also lead to misleading results. The meaningful, uninterrupted n-grams are called "CollGrams" by some researchers (Bestgen & Granger, 2014)[^1].
+
+## . Manually Creating Bigrams and Trigrams
+
+For this reason, I'll go back to the annotated data we created earlier. To inspect sequences of words, we can use the `lead()` function from the `dplyr` package, to create new columns that contain information regarding the next row of each word.
+
+```{r}
+txt_df <- txt_tab %>% 
+  mutate(second_word = lead(word), second_upos = lead(upos), second_pos = lead(pos), 
+         third_word = lead(word, 2), third_upos = lead(upos, 2), third_pos = lead(pos, 2))
+```
+
+```{r echo=FALSE}
+txt_df <- txt_df %>% select(-8)
+
+kable(txt_df[1:10,], row.names = FALSE) %>% 
+    kable_styling(bootstrap_options = c("condensed", "responsive"), 
+                  full_width = TRUE) %>% 
+    column_spec(4:7, background = "#f9f2f4") %>% 
+    column_spec(8:10, background = "#e6f3e6") %>% 
+    column_spec(11:13, background = "#e7e7f4")
+```
+
+In the newly created columns in light green are information pertaining to the next word, and the columns in light blue are that of the second next word. 
+
+To clean this data, we'll execute the following code. The `unite()` function from the `tidyr` package concatenates the `word` and `second_word` to show the biagram. Although where punctuation occurs can be of interest itself (e.g., marking clauses, inserting phrases, etc.), in this post I'll filter out the bigrams that include any punctuation marks to only consider two- or three-word sequences that co-occur without any interruption.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyr)
+
+txt_bi <- txt_df %>% unite(bigram, word, second_word, sep = " ") %>% 
+  filter(!second_upos == ".", !upos == ".") %>% select(1, 4:9)
+```
+
+```{r echo=FALSE}
+kable(txt_bi[1:8,], row.names = FALSE) %>% 
+    kable_styling(bootstrap_options = c("condensed", "responsive"), 
+                  full_width = TRUE) %>% 
+    column_spec(2, background = "#f9f2f4", bold = TRUE)
+```
+
+```{r}
+txt_tri <- txt_df %>% unite(trigram, word, second_word, third_word, sep = " ") %>% 
+  filter(!third_upos == ".", !second_upos == ".", !upos == ".") %>% select(1, 4:11)
+```
+
+```{r echo=FALSE}
+kable(txt_tri[1:8,], row.names = FALSE) %>% 
+    kable_styling(bootstrap_options = c("condensed", "responsive"), 
+                  full_width = TRUE) %>% 
+    column_spec(2, background = "#e6f3e6", bold = TRUE)
+```
+
+  
+## . Example Analysis: Be + words
+
+What's the most common part of speech that comes after the "be" verb? What does it say about the role of the "be" verb and the constituent that follows?
+
+```{r eval=FALSE}
+txt_bi %>% filter(lemma == "be") %>% count(second_upos, sort = TRUE)
+```
+
+Largely, "be" is most frequently followed by another verb. Looking at the POS tag reveals a bit more information.
+
+```{r eval=FALSE}
+txt_bi %>% filter(lemma == "be") %>% count(second_pos, sort = TRUE)
+```
+
+The "be" verb most frequently co-occurs with another verb in the past participle form (i.e., VBN), so presumably the 34 occurrences are passive constructions, in which "be" serves as an auxiliary. 
+
+It's almost certain that a determiner starts a noun phrase, thus in 27 cases the "be" verb is a main verb and is followed by a noun phrase complement. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=9, fig.align='left'}
+library(ggplot2); library(gridExtra)
+
+txt_pos_tb <- txt_bi %>% filter(lemma == "be") %>% count(second_pos, sort = TRUE) %>% 
+  rename(`Second POS` = second_pos, Frequency = n)
+
+txt_pos_gr <- ggplot(txt_pos_tb, 
+                     aes(reorder(`Second POS`, -Frequency), Frequency)) + 
+  geom_bar(stat = "identity", fill = "forestgreen", alpha = .8) + 
+  labs(x = "", y = "\nFrequency\n") + 
+  theme_minimal() + 
+  theme(axis.ticks.x = element_blank(), panel.grid.major.x = element_blank())
+
+grid.arrange(tableGrob(txt_pos_tb, theme = ttheme_minimal()), 
+             txt_pos_gr, ncol = 2, widths = c(0.2, 0.8))
+```
+
+```{r}
+txt_bi %>% filter(lemma == "be", second_pos == "VBN") %>% select(bigram)
+```
+
+The third most frequently co-occuring tag is the adverb. The question is then, what follows an adverb? Considering that verb past participle is the category that appears most frequently after "be", it could be that an adverb is inserted between these two verbs (*be* + adverb + past participle; e.g., *is actually made*). 
+
+It is also possible that the adverb is part of an adjective phrase (e.g., *is really important*), which in turn, may or may not constitute a noun phrase (e.g., *is really an important *). Let's dig a little deeper by looking at the trigrams.
+
+```{r}
+txt_tri %>% 
+    filter(lemma == "be", second_pos == "RB") %>% 
+    count(third_pos, sort = TRUE) %>% 
+    mutate(percent = round(n*100/sum(n), 1))
+```
+
+It appears that many of the "be + adverb" sequences (34.6%) are followed by an adjective, such as:
+
+```{r}
+txt_tri %>% 
+  filter(lemma == "be", second_pos == "RB", third_pos == "JJ") %>% 
+  select(trigram)
+```
+
+```{r include=FALSE}
+tidy_sen <- txt_cor %>% unnest_tokens(sentence, text, token = "sentences")
+tidy_sen <- tidy_sen %>% group_by(doc_id) %>% mutate(sid = 1:n())
+```
+
+```{r include=FALSE}
+tri_inv <- txt_tri %>% 
+    filter(lemma == "be", second_pos == "RB", third_pos == "JJ") %>% 
+    select(trigram)
+
+tri_inv$sentence <- rep(1, length(tri_inv$trigram))
+
+for (i in 1:length(tri_inv$trigram)) {
+  tri_inv$sentence[i] <- tidy_sen$sentence[grep(tri_inv$trigram[i], tidy_sen$sentence)]
+}
+```
+
+However, to determine the exact structure, we need to go further. We can look at the sentence where each trigram occurs.
+
+```{r echo=FALSE}
+kable(tri_inv, row.names = FALSE) %>% 
+    kable_styling(bootstrap_options = c("condensed", "responsive"), 
+                  full_width = TRUE) %>% 
+    column_spec(1, bold = TRUE, width = "15em")
+```
+
+As a very rough summary, we can say that out of 127 cases where the verb "be" was used, 40 were auxiliary be, consisting passive voice constructions and progressive forms. In other times, the verb was frequently followed by a noun phrase (at least 31 times) or an adjective phrase that may or may not be embedded in a noun phrase.
+
+[^1]: Bestgen, Y., & Granger, S. (2014). Quantifying the development of phraseological competence in L2 English writing: An automated approach. *Journal of Second Language Writing*, *26*, 28-41. https://doi.org/10.1016/j.jslw.2014.09.004.

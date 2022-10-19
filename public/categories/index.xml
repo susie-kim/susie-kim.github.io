@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Susie Kim</title>
+    <link>https://susie-kim.github.io/categories/</link>
+    <description>Recent content in Categories on Susie Kim</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 12 Jan 2019 12:30:00 -0500</lastBuildDate><atom:link href="https://susie-kim.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Corpus</title>
+      <link>https://susie-kim.github.io/categories/corpus/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/categories/corpus/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R</title>
+      <link>https://susie-kim.github.io/categories/r/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/categories/r/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

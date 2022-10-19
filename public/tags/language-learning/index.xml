@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>language learning on Susie Kim</title>
+    <link>https://susie-kim.github.io/tags/language-learning/</link>
+    <description>Recent content in language learning on Susie Kim</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 12 Jan 2019 12:30:00 -0500</lastBuildDate><atom:link href="https://susie-kim.github.io/tags/language-learning/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Web Scraping with R: A Great Resource for Language Learning and Teaching</title>
+      <link>https://susie-kim.github.io/posts/2019-01-12-web-scraping/</link>
+      <pubDate>Sat, 12 Jan 2019 12:30:00 -0500</pubDate>
+      
+      <guid>https://susie-kim.github.io/posts/2019-01-12-web-scraping/</guid>
+      <description>1 . Introduction 1.1 . Tools Needed 2 . Example 1: Scraping Webpages 2.1 . Wikipedia entries 2.2 . More ideas 3 . Example 2: Scraping Blogs 3.1 . The Big Bang Theory transcripts 3.2 . More ideas 4 . Example 3: Scraping Online Newspapers 4.1 . Social Commentary from CNN 4.2 . More ideas 5 . Summary 1 . Introduction Recently, I helped a colleague scrape text from Wikipedia for a class project.</description>
+    </item>
+    
+  </channel>
+</rss>

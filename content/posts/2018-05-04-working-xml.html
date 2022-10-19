@@ -1,0 +1,125 @@
+---
+title: "Working with XML-formatted text annotations in R"
+author: Susie Kim
+date: '2018-05-04T10:34:40-05:00'
+tags:
+- corpus
+- corenlp
+- nlp
+- xml
+- R
+- corpus analysis
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#from-xml-to-tagged-corpus"><span class="toc-section-number">1</span> . From XML to tagged corpus</a><ul>
+<li><a href="#creating-tagged-text"><span class="toc-section-number">1.1</span> . Creating tagged text</a></li>
+<li><a href="#rendering-xml-to-data-frame"><span class="toc-section-number">1.2</span> . Rendering xml to data frame</a></li>
+<li><a href="#creating-tagged-texts"><span class="toc-section-number">1.3</span> . Creating tagged texts</a></li>
+</ul></li>
+<li><a href="#example-query-and-concordances"><span class="toc-section-number">2</span> . Example query and concordances</a></li>
+</ul>
+</div>
+
+<p>In this post I’m documenting how to reformat the XML-formatted files outputted by the Stanford CoreNLP tool. This might not be the most elegant way to go about it, but this is something that works for me. Here, I will be using R and the XML files produced in the previous step.</p>
+<div id="from-xml-to-tagged-corpus" class="section level1">
+<h1><span class="header-section-number">1</span> . From XML to tagged corpus</h1>
+<div id="creating-tagged-text" class="section level2">
+<h2><span class="header-section-number">1.1</span> . Creating tagged text</h2>
+<p>The files have been tokenized and POS-tagged using java in another platform. Here, I read in the annotated XML files and save them in a data frame with a row for each token ($token-node) and a column for each tag (variable) describing it.</p>
+<p>First step, (install and) load the <code>XML</code>, <code>dplyr</code>, and <code>purrr</code> libraries:</p>
+<pre class="r"><code>library(XML); library(dplyr); library(purrr)</code></pre>
+</div>
+<div id="rendering-xml-to-data-frame" class="section level2">
+<h2><span class="header-section-number">1.2</span> . Rendering xml to data frame</h2>
+<p>Next, I will read in the files. My preference is that before I start, I move the XML files to a new folder (and XML files only), usually under the working directory that I have set for the current R session. I’ll call this new foler <code>xml</code> (located under the “corpus” folder in the current working directory). The following codes will read the filenames and then change the working directory to the folder that contains these files. The codes that appear in the remainder of this post won’t work if you don’t change the working directory to where the XML files are. Specify your own folder in the parentheses.</p>
+<pre class="r"><code># Read the files
+files &lt;- list.files(&quot;corpus/xml&quot;)
+setwd(&quot;corpus/xml&quot;)</code></pre>
+<p>Now this is a function that will 1) parse the XML and 2) extract the XML-values from the document. This is an adaptation from the codes I found from a <a href="https://stackoverflow.com/questions/34627994/nested-xml-parsing-in-r">Stack overflow post</a>:</p>
+<pre class="r"><code>tags_df &lt;- function(file){
+    message(&quot;Loading &quot;, file)
+    xlist &lt;- file %&gt;% xmlInternalTreeParse() %&gt;% 
+        xmlRoot() %&gt;% 
+        xpathSApply(&quot;//token&quot;, function(x) xmlSApply(x, xmlValue))
+    tags &lt;- data.frame(t(xlist), row.names = NULL)
+}</code></pre>
+<p>If you remember the tree structure of these XML files, the information about each token is saved under the <code>token</code> node. Therefore, I inserted the the argument <code>"//token"</code>, which will create a data list that saves all values under this node (as realized by the xpath).</p>
+<p>The <code>tags_df</code> function will put out loading message for each file as it processes.</p>
+<p>Currently, the information are stored in <code>all.tags</code>, a list which is difficult to access. I will creat a data frame called <code>xml_df</code> and save necessary token information there.</p>
+<pre class="r"><code># Create a data frame containing the tag information
+xml_df &lt;- map(files, tags_df) %&gt;% 
+    set_names(files) %&gt;% 
+    bind_rows(.id = &quot;id&quot;)</code></pre>
+<p>The above command applies the function <code>tags_df</code>, which extracts information under the <code>//token</code> node, to all xml files we have listed (i.e., <code>files</code>). Then it binds the information from all files to one data frame.</p>
+<p>Now, the data frame <code>xml_df</code> should have each word in a row along with the POS and lemma associated with it in columns.</p>
+<p>What I eventually want to do is to make everything a string so that I can search for sequences of words (e.g., may + verb infinitive) using regular expressions. The result I want is a list of sentences that include the specific sequence of words. To do this, I will need to separate sentences from the entire text.</p>
+<p>The only way I know how to do this is to label each token its token ID. Token ID indicates the n-th word in each sentence. Therefore, whenever I have token ID #1, I know it is a new sentence. I will come back to this idea later.</p>
+<pre class="r"><code># Another function that retrieves the attribute information, which is the token ID
+tid_df &lt;- function(file){
+    message(&quot;Loading &quot;, file)
+    xlist &lt;- file %&gt;%
+        xmlInternalTreeParse() %&gt;% 
+        xmlRoot() %&gt;% 
+        xpathSApply(&quot;//tokens&quot;, function(x) xmlSApply(x, xmlAttrs))
+    tids &lt;- data.frame(t(xlist), row.names = NULL)
+    }
+
+# Create a data list of token IDs
+all_tids &lt;- map(files, tid_df) %&gt;% 
+    bind_rows()</code></pre>
+<pre class="r"><code># Append the token IDs to the data frame xml_df
+xml_df$tid &lt;- all_tids</code></pre>
+</div>
+<div id="creating-tagged-texts" class="section level2">
+<h2><span class="header-section-number">1.3</span> . Creating tagged texts</h2>
+<p>Now that I have all the information I need in one place, I will save them as a text that looks something like this: &lt;tid=“1”&gt;&lt;pos=“VB” lem=“do”&gt;Do &lt;tid=“2”&gt;&lt;pos=“ADV” lem=“not”&gt;n’t &lt;tid=“3”&gt;&lt;pos=“VB” lem=“be”&gt;be …</p>
+<pre class="r"><code>text &lt;- paste0(&quot;&lt;t=\&quot;&quot;, xml_df$tid, &quot;\&quot;&gt;&quot;, 
+               &quot;&lt;pos=\&quot;&quot;, xml_df$POS, &quot;\&quot; lem=\&quot;&quot;, xml_df$lemma, &quot;\&quot;&gt;&quot;, 
+               xml_df$word, collapse = &quot; &quot;)</code></pre>
+<p>I have the output now saved as <code>text</code>. I will remove the token IDs (&lt;t=“n”&gt;) but replace all &lt;t=“1”&gt;s with &lt;s&gt; to mark the beginnings of sentences.</p>
+<pre class="r"><code>text &lt;- gsub(&quot;&lt;t=\&quot;1\&quot;&gt;&quot;, &quot;\n&lt;s&gt;&quot;, text, perl = TRUE)
+text &lt;- gsub(&quot;&lt;t=\&quot;.{1,2}\&quot;&gt;&quot;, &quot;&quot;, text, perl = TRUE)
+
+write(text, &quot;corpus.txt&quot;)</code></pre>
+<p>Now I have a single text file that composites all texts I originally had, all tagged with POS and lemma, each sentence separated by a new line and the tag &lt;s&gt;.</p>
+</div>
+</div>
+<div id="example-query-and-concordances" class="section level1">
+<h1><span class="header-section-number">2</span> . Example query and concordances</h1>
+<p>As an example, I will find sentences that include a grammatical structure, “may + verb infinitive”. This draws on Dr. Stephan Gries’ <a href="http://www.linguistics.ucsb.edu/faculty/stgries/research/qclwr/qclwr.html">Quantitative corpus linguistics with R</a>.</p>
+<pre class="r"><code># Read the text file in
+corpus &lt;- scan(&quot;corpus.txt&quot;, what = &quot;char&quot;, sep = &quot;\n&quot;, quiet = TRUE)
+
+# Change the text to lower case and save as &#39;working_corpus&#39;
+working_corpus &lt;- tolower(corpus)
+
+# Parse the text into sentences and save it
+working_corpus &lt;- grep(&quot;&lt;s&gt;&quot;, working_corpus, value = TRUE, perl = TRUE)
+
+# Extract the sentences that include &quot;may + verb&quot;
+find_matches &lt;- grep(&quot;&lt;pos=\&quot;md\&quot; lem=\&quot;may\&quot;&gt;[^&lt;]* &lt;pos=\&quot;vb\&quot; lem=\&quot;[^&lt;]*\&quot;&gt;[^&lt;]*&quot;, working_corpus, value = TRUE, perl = TRUE)
+
+# Remove the POS tags to get clean sentences
+clean_matches &lt;- gsub(&quot;&lt;.*?&gt;&quot;, &quot;&quot;, find_matches, perl = TRUE)
+
+# Remove the space before punctuation
+clean_matches &lt;- gsub(&quot; (?=[.,!?])&quot;, &quot;&quot;, clean_matches, perl = TRUE)</code></pre>
+<p>See the results - ta-da!</p>
+<pre class="r"><code>print(clean_matches)</code></pre>
+<pre><code>## [1] &quot;dramatic it may be but basically that &quot;                                                                                                                                                                                                                                                                     
+## [2] &quot;without the large sums of money envolved boxing would be far more dangerous because the medical care would be poorer. so, those that say the money pushes these boxers to their fates may be wrong in thinking so because it &quot;                                                                              
+## [3] &quot;would be no supervision and professional referring so boxing accidents may occur and they may result worst than they do now, because there would be no immediate &quot;                                                                                                                                          
+## [4] &quot;of the most popular sports of this era, it is almost one of the most deadly. during a fight a boxer may receive several hundred punches to the head, and each time that he gets punched he looses more and more brain cells. the brain is encased in the skull, but not only in the skull is the brain but &quot;</code></pre>
+<p>Save the results as a file:</p>
+<pre class="r"><code>write.csv(clean_matches, &quot;matches.csv&quot;)</code></pre>
+</div>

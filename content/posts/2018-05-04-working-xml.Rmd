@@ -1,0 +1,187 @@
+---
+title: "Working with XML-formatted text annotations in R"
+author: Susie Kim
+date: '2018-05-04T10:34:40-05:00'
+tags:
+- corpus
+- corenlp
+- nlp
+- xml
+- R
+- corpus analysis
+categories:
+- R
+- Corpus
+output:
+    blogdown::html_page:
+        toc: true
+        number_sections: true
+---
+
+In this post I'm documenting how to reformat the XML-formatted files outputted by the Stanford CoreNLP tool. This might not be the most elegant way to go about it, but this is something that works for me. Here, I will be using R and the XML files produced in the previous step.
+
+# . From XML to tagged corpus
+## . Creating tagged text
+The files have been tokenized and POS-tagged using java in another platform. Here, I read in the annotated XML files and save them in a data frame with a row for each token ($token-node) and a column for each tag (variable) describing it. 
+
+First step, (install and) load the `XML`, `dplyr`, and `purrr` libraries:
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(XML); library(dplyr); library(purrr)
+```
+
+## . Rendering xml to data frame
+Next, I will read in the files. My preference is that before I start, I move the XML files to a new folder (and XML files only), usually under the working directory that I have set for the current R session. I'll call this new foler `xml` (located under the "corpus" folder in the current working directory). The following codes will read the filenames and then change the working directory to the folder that contains these files. The codes that appear in the remainder of this post won't work if you don't change the working directory to where the XML files are. Specify your own folder in the parentheses.
+
+```{r eval=FALSE}
+# Read the files
+files <- list.files("corpus/xml")
+setwd("corpus/xml")
+```
+
+Now this is a function that will 1) parse the XML and 2) extract the XML-values from the document. This is an adaptation from the codes I found from a [Stack overflow post](https://stackoverflow.com/questions/34627994/nested-xml-parsing-in-r): 
+
+```{r include=FALSE}
+files <- list.files("corpus/xml")
+
+tags_df <- function(file){
+    message("Loading ", file)
+    xlist <- file %>% 
+        xmlInternalTreeParse() %>% 
+        xmlRoot() %>% 
+        xpathSApply("//token", function(x) xmlSApply(x, xmlValue))
+    tags <- data.frame(t(xlist), row.names = NULL)
+}
+
+# Another function that retrieves the attribute information, which is the token ID
+tid_df <- function(file){
+    message("Loading ", file)
+    xfile <- file %>% 
+        xmlInternalTreeParse() %>% 
+        xmlRoot() %>% 
+        xpathSApply("//tokens", function(x) xmlSApply(x, xmlAttrs))
+    tids <- data.frame(t(xfile), row.names = NULL)
+}
+
+setwd("corpus/xml")
+
+# Create a data frame containing the tag information
+xml_df <- map(files, tags_df) %>% 
+    set_names(files) %>% 
+    bind_rows(.id = "id")
+
+# Create a data list of token IDs
+all_tids <- map(files, tid_df) %>% 
+    bind_rows() %>% 
+    unlist()
+```
+
+```{r eval=FALSE}
+tags_df <- function(file){
+    message("Loading ", file)
+    xlist <- file %>% xmlInternalTreeParse() %>% 
+        xmlRoot() %>% 
+        xpathSApply("//token", function(x) xmlSApply(x, xmlValue))
+    tags <- data.frame(t(xlist), row.names = NULL)
+}
+```
+
+If you remember the tree structure of these XML files, the information about each token is saved under the `token` node. Therefore, I inserted the the argument `"//token"`, which will create a data list that saves all values under this node (as realized by the xpath).
+
+The `tags_df` function will put out loading message for each file as it processes.
+
+Currently, the information are stored in `all.tags`, a list which is difficult to access. I will creat a data frame called `xml_df` and save necessary token information there.
+
+```{r eval=FALSE}
+# Create a data frame containing the tag information
+xml_df <- map(files, tags_df) %>% 
+    set_names(files) %>% 
+    bind_rows(.id = "id")
+```
+
+The above command applies the function `tags_df`, which extracts information under the `//token` node, to all xml files we have listed (i.e., `files`). Then it binds the information from all files to one data frame. 
+
+Now, the data frame `xml_df` should have each word in a row along with the POS and lemma associated with it in columns.
+
+What I eventually want to do is to make everything a string so that I can search for sequences of words (e.g., may + verb infinitive) using regular expressions. The result I want is a list of sentences that include the specific sequence of words. To do this, I will need to separate sentences from the entire text. 
+
+The only way I know how to do this is to label each token its token ID. Token ID indicates the n-th word in each sentence. Therefore, whenever I have token ID #1, I know it is a new sentence. I will come back to this idea later.
+
+```{r eval=FALSE}
+# Another function that retrieves the attribute information, which is the token ID
+tid_df <- function(file){
+    message("Loading ", file)
+    xlist <- file %>%
+        xmlInternalTreeParse() %>% 
+        xmlRoot() %>% 
+        xpathSApply("//tokens", function(x) xmlSApply(x, xmlAttrs))
+    tids <- data.frame(t(xlist), row.names = NULL)
+    }
+
+# Create a data list of token IDs
+all_tids <- map(files, tid_df) %>% 
+    bind_rows()
+```
+
+```{r}
+# Append the token IDs to the data frame xml_df
+xml_df$tid <- all_tids
+```
+
+## . Creating tagged texts
+Now that I have all the information I need in one place, I will save them as a text that looks something like this: <tid="1"><pos="VB" lem="do">Do <tid="2"><pos="ADV" lem="not">n't <tid="3"><pos="VB" lem="be">be ...
+
+```{r}
+text <- paste0("<t=\"", xml_df$tid, "\">", 
+               "<pos=\"", xml_df$POS, "\" lem=\"", xml_df$lemma, "\">", 
+               xml_df$word, collapse = " ")
+```
+
+I have the output now saved as `text`. I will remove the token IDs (\<t="n"\>) but replace all \<t="1"\>s with \<s\> to mark the beginnings of sentences.
+
+```{r}
+text <- gsub("<t=\"1\">", "\n<s>", text, perl = TRUE)
+text <- gsub("<t=\".{1,2}\">", "", text, perl = TRUE)
+
+write(text, "corpus.txt")
+```
+
+Now I have a single text file that composites all texts I originally had, all tagged with POS and lemma, each sentence separated by a new line and the tag \<s\>.
+
+
+# . Example query and concordances
+
+As an example, I will find sentences that include a grammatical structure, "may + verb infinitive". This draws on Dr. Stephan Gries' [Quantitative corpus linguistics with R](http://www.linguistics.ucsb.edu/faculty/stgries/research/qclwr/qclwr.html).
+
+```{r}
+# Read the text file in
+corpus <- scan("corpus.txt", what = "char", sep = "\n", quiet = TRUE)
+
+# Change the text to lower case and save as 'working_corpus'
+working_corpus <- tolower(corpus)
+
+# Parse the text into sentences and save it
+working_corpus <- grep("<s>", working_corpus, value = TRUE, perl = TRUE)
+
+# Extract the sentences that include "may + verb"
+find_matches <- grep("<pos=\"md\" lem=\"may\">[^<]* <pos=\"vb\" lem=\"[^<]*\">[^<]*", working_corpus, value = TRUE, perl = TRUE)
+
+# Remove the POS tags to get clean sentences
+clean_matches <- gsub("<.*?>", "", find_matches, perl = TRUE)
+
+# Remove the space before punctuation
+clean_matches <- gsub(" (?=[.,!?])", "", clean_matches, perl = TRUE)
+```
+
+See the results - ta-da!
+
+```{r}
+print(clean_matches)
+```
+
+Save the results as a file:
+
+```{r eval=FALSE}
+write.csv(clean_matches, "matches.csv")
+```
+

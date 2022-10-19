@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Photos on Susie Kim</title>
+    <link>https://susie-kim.github.io/photos/</link>
+    <description>Recent content in Photos on Susie Kim</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 11 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://susie-kim.github.io/photos/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Morning, Moon, Fall</title>
+      <link>https://susie-kim.github.io/photos/pic_101122_0737/</link>
+      <pubDate>Tue, 11 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://susie-kim.github.io/photos/pic_101122_0737/</guid>
+      <description>On my way to work, 7:37am, October 11, 2022.</description>
+    </item>
+    
+    <item>
+      <title>Moon, Clouds, Night</title>
+      <link>https://susie-kim.github.io/photos/pic_102118_2152/</link>
+      <pubDate>Thu, 18 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://susie-kim.github.io/photos/pic_102118_2152/</guid>
+      <description>Taken with iOptron SkyTracker 23mm | f/8 | 5</description>
+    </item>
+    
+  </channel>
+</rss>
