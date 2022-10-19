@@ -5,5 +5,5 @@ title: Lunar Eclipse 2019
 type: gallery
 ---
 
-Lunar Eclipse, January 2019.
+Lunar Eclipse, January 2019.  
 75mm | 30s
