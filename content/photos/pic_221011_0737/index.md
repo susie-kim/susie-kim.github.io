@@ -5,5 +5,5 @@ title: Morning, Moon, Fall
 type: gallery
 ---
 
-On my way to work, 7:37am, October 11, 2022.  
+On my way to work on a fall day, 7:37am.  
 83mm | f/5.6 | 1/1500s
