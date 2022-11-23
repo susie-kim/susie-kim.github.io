@@ -1,6 +1,6 @@
 ---
 date: "2022-11-23"
-image: pic_221123_0200.jpg
+image: pic_221123_0200.png
 title: Orion and Sirius
 type: gallery
 ---
