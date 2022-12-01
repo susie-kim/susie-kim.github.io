@@ -5,5 +5,4 @@ title: Jupiter Tree
 type: gallery
 ---
 
-Me, Tree, Jupiter, Pisces, Pegasus  
 24 mm | f/2.8 | 3s
