@@ -3,13 +3,13 @@ date: "2016-11-05T21:05:33+05:30"
 title: About
 ---
 
-My name is Susie Kim and I am an applied linguist and a language teacher. My current position is a Lecturer in Korean Language for the [Department of East Asian Studies](https://eas.princeton.edu) at Princeton University.
+Hello! My name is Susie Kim and I am an applied linguist and a language teacher. My current position is a Lecturer in Korean Language for the [Department of East Asian Studies](https://eas.princeton.edu) at Princeton University.
 
-My main academic interest sits at an intersection of language assessment, second language writing, and corpus-based methods. I have primarily focused on investigating linguistic characteristics and textual features of second language (L2) English at various proficiency levels. More recently, I have been working on building and analyzing Korean language corpora and related tools for teaching purposes.
+My main academic interest sits at an intersection of language assessment, second language writing, and corpus-based methods. I have primarily focused on investigating linguistic characteristics and textual features of second language writing at various proficiency levels. More recently, I have been working on building and analyzing Korean language corpora and related tools for teaching purposes.
 
-I have a wide range of personal interests and, though amateur, enjoy: photography, cooking, and programming.
+Photography is something I have always enjoyed in my life so I [post them here](https://susiekim.work/photos/) sometimes. I feel lucky to have had experiences in a darkroom from high school to college but now I'm most interested in long-exposure photography of nature and the night sky. 
 
-On this website, I share some research tools and methods as I work through them for my academic projects or personal enjoyment. Please feel free to explore the contacts and contact me!
+On this website, I share some research tools and methods as I work through them for my academic projects or personal enjoyment. Please feel free to explore the contents and contact me!
 
   
   
@@ -40,7 +40,7 @@ $ Language Proficiency Standards
   
 ## Education
 
-- Ph.D. in Second Language Studies, 2019, Michigan State University (East Lansing, Michigan, USA)
+- Ph.D. in [Second Language Studies](https://sls.msu.edu), 2019, Michigan State University (East Lansing, Michigan, USA)
 - M.Ed. in English Education, 2013, Graduate School of Education, Yonsei University (Seoul, South Korea)
 - B.A. in English Language and Literature, 2011, Yonsei University (Seoul, South Korea)
   
