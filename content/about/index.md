@@ -25,7 +25,8 @@ $ Language Proficiency Standards
 
 ## Recent works
 
-- Kim, S. & Kessler, M. (2022). [Examining L2 English University students’ uses of lexical bundles and their relationship to writing quality.](https://doi.org/10.1016/j.asw.2021.100589) *Assessing Writing*, 51.
+- Kim, S. & Isbell, D. (2025). [Diagnostic assessment of pronunciation in a Korean language classroom: An action research study.](https://doi.org/10.1515/9783111233918-003) In D. Leontjev, M. Poehner & A. Huhta (Ed.), *Dynamic and Diagnostic Language Assessment: Learning across Frameworks to Support Second/Foreign Language Education* (pp. 53-72). De Gruyter Mouton. 
+- Kim, S. & Kessler, M. (2022). [Examining L2 English university students’ uses of lexical bundles and their relationship to writing quality.](https://doi.org/10.1016/j.asw.2021.100589) *Assessing Writing*, 51.
 - Kim, S. (2021). [Generalizability of CEFR Criterial Grammatical Features in a Korean EFL Corpus across A1, A2, B1, and B2 Levels.](https://doi.org/10.1080/15434303.2020.1855647) *Language Assessment Quarterly*, 18(3), 273-295.
 - Crowther, D., Kim, S., Lee, J., Lim, J., & Loewen, S. (2021). [Methodological synthesis of cluster analysis in Second Language research.](https://doi.org/10.1111/lang.12428) *Language Learning*, 71(1), 99-130.
 - Kim, S. (2019). [Assessing Grammatical Features across Score Levels in Second Language Writing: A Corpus-Based Analysis.](https://www.proquest.com/openview/04e3a6d272865c9dccfcf444ae530381/1?pq-origsite=gscholar&cbl=18750&diss=y) Doctoral Dissertation, Michigan State University.
@@ -33,9 +34,9 @@ $ Language Proficiency Standards
 
 ## Courses taught at Princeton
 
-- KOR 101/102 Elementary Korean I & II (Fall 2019 - Spring 2022) 
-- KOR 105/107 Intermediate Korean I & II (Fall 2019 - Current)
-- KOR 301/302 Advanced Korean I & II (Fall 2021 - Current)
+- KOR 101/102 Elementary Korean I & II
+- KOR 105/107 Intermediate Korean I & II
+- KOR 301/302 Advanced Korean I & II
 
   
 ## Education
